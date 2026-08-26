@@ -1,0 +1,94 @@
+{
+  "accounting": {
+    "original": {
+      "attempt_count": 8,
+      "cache_hit_count": 0,
+      "charged_evaluation_count": 8,
+      "decision_count": 8,
+      "physical_call_started_count": 8,
+      "unresolved_decision_count": 0
+    },
+    "replay": {
+      "attempt_count": 8,
+      "cache_hit_count": 0,
+      "charged_evaluation_count": 8,
+      "decision_count": 8,
+      "physical_call_started_count": 8,
+      "unresolved_decision_count": 0
+    }
+  },
+  "artifacts": {
+    "original_database_bytes": 110592,
+    "original_database_sha256": "bdb2abfed108b9801ac12d534d4c4243be23f4e176e939af9461789893aa291e",
+    "replay_database_bytes": 110592,
+    "replay_database_sha256": "3e92c45a450914b522dfb322eff34aff3fad8d0e422804176dabcdc26a6e49e2"
+  },
+  "checks": {
+    "accounting": true,
+    "archive": true,
+    "attempts": true,
+    "decisions": true,
+    "evaluations": true,
+    "run_context": true,
+    "solutions": true,
+    "terminal": true
+  },
+  "first_mismatch": null,
+  "implementation_independence": false,
+  "original_counts": {
+    "attempts": 8,
+    "decisions": 8,
+    "evaluations": 8,
+    "solutions": 8
+  },
+  "problem_binding": {
+    "binding_kind": "explicit_case_artifact_sha256_v1",
+    "context_case_artifact_sha256": "7119aa22d9a1a8e89cdd6dd41567ee2eea72373934e17343acb98d7fc9f4c617",
+    "problem_artifact_sha256": "7119aa22d9a1a8e89cdd6dd41567ee2eea72373934e17343acb98d7fc9f4c617",
+    "problem_semantic_sha256": "63aee3d6fe210905ecba38754855b20351d91926014bcd6dd3f496ecb6da9340"
+  },
+  "receipt_payload_sha256": "c11ceb9abee22ecb29659c821acf60c871f6790333db3852c402a799fe31876d",
+  "replay_counts": {
+    "attempts": 8,
+    "decisions": 8,
+    "evaluations": 8,
+    "solutions": 8
+  },
+  "run_context_binding": {
+    "algorithm_source_sha256": "80bf6edce12800907bb65625797914319e62916f71d494e2bc25ae958e4109e3",
+    "candidate_config_sha256": "cb229846c9524760092682b1d6ff295cb810497b0b5c92b6d5979b230750fbc3",
+    "digest_sha256": "62b484f16e779197786e8cc2e081c796ca0cc3b55a0648525f64003bd7c85239",
+    "schema": "v21e3r1_run_context_v2"
+  },
+  "schema": "v21e3r1_same_implementation_branch_replay_v1",
+  "scientific_independence": false,
+  "scope": "same_source_stochastic_program_reexecution_not_independent_replication",
+  "source_binding": {
+    "binding_kind": "explicit_source_snapshot_or_release_manifest_sha256_v1",
+    "context_source_sha256": "80bf6edce12800907bb65625797914319e62916f71d494e2bc25ae958e4109e3",
+    "executing_module": "mo_nco/pareto_v21e3_hybrid.py",
+    "executing_module_sha256": "65bb79a6b6a10560daa4124073e67d9d7124d6a051b54799f33ec3969a710cdc",
+    "replay_verified": true,
+    "source_closure_file_count": 173,
+    "source_closure_scope": "all_live_mo_nco_python_sources",
+    "source_closure_verified": true,
+    "source_manifest": "D:\\MO_NCO\\v9r2r1_validation_20260825_001\\installed_smoke_mokp\\source_manifest.json",
+    "source_manifest_sha256": "329ec642e5902fbc3ec97a08345e55edc431be515eccd4bafd440828d45dd301"
+  },
+  "status": "PASS_SAME_IMPLEMENTATION_FULL_BRANCH_REEXECUTION",
+  "terminal_bindings": {
+    "original": {
+      "failure_code": null,
+      "receipt_sha256": "85c3bc824ae68561fdc2b602e87ca91179974096954689a32203d985435fea68",
+      "run_status": "SUCCESS",
+      "terminal_status": "SUCCESS"
+    },
+    "replay": {
+      "failure_code": null,
+      "receipt_sha256": "f054535c9c3f6b30a6491292f4ef0e3d43f9b4f8e2a61381b6d54cdda0213e00",
+      "run_status": "SUCCESS",
+      "terminal_status": "SUCCESS"
+    }
+  },
+  "third_party_replication": false
+}

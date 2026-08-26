@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mo-nco"
+version = "0.21.3.14"
+description = "Theory-audited population optimizers for multi-objective combinatorial optimization"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+accelerate = ["numpy>=1.24", "numba>=0.58"]
+receipt = ["cryptography>=41"]
+
+[project.scripts]
+mo-nco-v21e3r1 = "mo_nco.pareto_v21e3_common_runner:main"
+mo-nco-v21e3r1-precedent = "mo_nco.pareto_v21e3r1_precedent:main"
+mo-nco-v21e3r1-analyze-existing = "mo_nco.pareto_v21e3r1_development_diagnostics:main"
+mo-nco-v21e3r1-branch-replay = "mo_nco.pareto_v21e3r1_branch_replay:main"
+mo-nco-v21e3r1-v9-run = "mo_nco.pareto_v21e3r1_v9_runner:main"
+mo-nco-v21e3r1-v9-analyze = "mo_nco.pareto_v21e3r1_v9_diagnostics:main"
+mo-nco-v21e3r1-v9-gate = "mo_nco.pareto_v21e3r1_v9_gate:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mo_nco*"]
+
+[tool.setuptools.package-data]
+mo_nco = ["specs/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "--strict-markers"

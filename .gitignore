@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.nbc
+*.nbi
+*.egg-info/
+build/
+dist/
