@@ -1,0 +1,174 @@
+name: V9R2R1 current source
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scoped-current-source:
+    name: Scoped source identity and targeted regression
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.15"
+          cache: pip
+          cache-dependency-path: requirements/base.lock
+
+      - name: Verify requirement-file checksums
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($line in Get-Content -LiteralPath requirements/locks.sha256) {
+            if ($line -notmatch '^([0-9a-f]{64})  (.+)$') { throw "invalid locks.sha256 line: $line" }
+            $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $Matches[2]).Hash.ToLowerInvariant()
+            if ($actual -ne $Matches[1]) { throw "lock checksum mismatch: $($Matches[2])" }
+          }
+
+      - name: Install exact base version closure
+        shell: pwsh
+        run: |
+          python -m pip install --no-deps -r requirements/base.lock
+          if ($LASTEXITCODE -ne 0) { throw 'base lock installation failed' }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'pip check failed' }
+          python -c "from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey; import pytest"
+          if ($LASTEXITCODE -ne 0) { throw 'required test-import closure failed' }
+
+      - name: Verify declared test-dependency contract
+        shell: pwsh
+        run: |
+          python -m pytest -q -p no:cacheprovider tests/test_v9r2r1_dependency_contract.py
+          if ($LASTEXITCODE -ne 0) { throw 'test-dependency contract drifted' }
+
+      - name: Verify checked-in 203-file Git blob identity
+        shell: pwsh
+        run: |
+          python scripts/verify_v9r2r1_current_source.py `
+            --root . `
+            --manifest V21E3R1_V9R2R1_SOURCE_MANIFEST.json `
+            --require-git-tracked `
+            --require-pass
+          if ($LASTEXITCODE -ne 0) { throw 'source identity verification failed' }
+
+      - name: Verify full-suite test-source closure manifest
+        shell: pwsh
+        run: |
+          python scripts/build_v9r2r1_full_suite_test_manifest.py verify `
+            --root . `
+            --manifest provenance/V9R2R1_FULL_SUITE_TEST_MANIFEST.json
+          if ($LASTEXITCODE -ne 0) { throw 'full-suite test-source closure drifted' }
+
+      - name: Run scoped V9R2R1 regression
+        shell: pwsh
+        run: |
+          python -m pytest -q -p no:cacheprovider --tb=short `
+            --junitxml="$env:RUNNER_TEMP\targeted.junit.xml" `
+            tests/test_pareto_v21e3r1_v9_information_search.py `
+            tests/test_pareto_v21e3r1_v9_strict_regressions.py `
+            tests/test_pareto_v21e3r1_v9r1_theory_strict.py `
+            tests/test_pareto_v21e3r1_v9_diagnostics_strict.py `
+            tests/test_pareto_v21e3r1_branch_replay.py `
+            tests/test_pareto_v21e3r1_v9_runner.py `
+            tests/test_pareto_v21e3_trace.py `
+            tests/test_pareto_v21e3_trace_verify.py `
+            tests/test_pareto_v21e3_trace_chunks.py `
+            tests/test_pareto_v21e3r1_v9_protocol.py `
+            tests/test_pareto_v21e3r1_v9_gate.py `
+            tests/test_pareto_v21e3r1_v9_packaging.py `
+            tests/test_build_v9r2r1_engineering_source_bundle.py `
+            tests/test_check_v9r2r1_full_suite_environment.py `
+            tests/test_pareto_v21e3r1_development_diagnostic_runner.py `
+            tests/test_v21e3r1_same_implementation_branch_replay_coverage.py
+          if ($LASTEXITCODE -ne 0) { throw 'scoped regression failed' }
+
+      - name: Compile declared source closure
+        shell: pwsh
+        run: |
+          python -m compileall -q mo_nco scripts/build_v9r2r1_engineering_source_bundle.py scripts/check_v9r2r1_full_suite_environment.py ijoc_submission_v21e3r1/scripts/run_v21e3r1_development_diagnostics.py ijoc_submission_v21e3r1/scripts/run_v21e3r1_same_implementation_branch_replay_coverage.py
+          if ($LASTEXITCODE -ne 0) { throw 'compileall failed' }
+
+      - name: Upload targeted JUnit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9r2r1-targeted-junit
+          path: ${{ runner.temp }}/targeted.junit.xml
+          if-no-files-found: error
+
+  recovered-optional-backend:
+    name: Version-pinned pymoo/moocore recovery seam
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.12"
+          cache: pip
+          cache-dependency-path: requirements/optional-pymoo.lock
+
+      - name: Verify requirement-file checksums
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($line in Get-Content -LiteralPath requirements/locks.sha256) {
+            if ($line -notmatch '^([0-9a-f]{64})  (.+)$') { throw "invalid locks.sha256 line: $line" }
+            $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $Matches[2]).Hash.ToLowerInvariant()
+            if ($actual -ne $Matches[1]) { throw "lock checksum mismatch: $($Matches[2])" }
+          }
+
+      - name: Install observed full-suite version closure
+        shell: pwsh
+        run: |
+          python -m pip install --no-deps -r requirements/optional-pymoo.lock
+          if ($LASTEXITCODE -ne 0) { throw 'optional backend installation failed' }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'pip check failed' }
+          python -c "from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey; import moocore, pytest, pymoo"
+          if ($LASTEXITCODE -ne 0) { throw 'full test-import closure failed' }
+
+      - name: Run fail-closed backend preflight
+        shell: pwsh
+        run: |
+          $python = (Get-Command python).Source
+          $receipt = Join-Path $env:RUNNER_TEMP 'full_suite_environment_preflight.json'
+          python scripts/check_v9r2r1_full_suite_environment.py `
+            --expected-python-executable $python `
+            --expected-python-version-prefix 3.13.12 `
+            --expected-pymoo-version 0.6.1.6 `
+            --expected-moocore-version 0.3.1 `
+            --output $receipt
+          if ($LASTEXITCODE -ne 0) { throw 'HOLD_FULL_SUITE_ENVIRONMENT' }
+          Write-Warning 'Version closure passed; complete artifact-hashed environment lock remains false.'
+
+      - name: Execute pymoo recovery seam
+        shell: pwsh
+        run: |
+          python -m pytest -q -p no:cacheprovider --tb=short `
+            --junitxml="$env:RUNNER_TEMP\pymoo-recovery.junit.xml" `
+            tests/test_external_pymoo_baseline.py `
+            tests/test_ijoc_algorithm_adapters.py `
+            -k pymoo
+          if ($LASTEXITCODE -ne 0) { throw 'pymoo recovery regression failed' }
+
+      - name: Upload backend preflight and JUnit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9r2r1-backend-recovery
+          path: |
+            ${{ runner.temp }}/full_suite_environment_preflight.json
+            ${{ runner.temp }}/pymoo-recovery.junit.xml
+          if-no-files-found: error

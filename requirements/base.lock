@@ -1,0 +1,25 @@
+# V9R2R1 base version lock.
+# Observed with C:\miniconda3\envs\ssm_env\python.exe, CPython 3.11.15,
+# on Windows AMD64 on 2026-08-26. This file pins the complete active
+# dependency closure of the direct inputs in base.in.  The pytest/build roots
+# were observed in the Python 3.11 evidence environment; the cryptography
+# closure matches the observed Python 3.13 full-suite environment and is
+# independently installation-checked on Python 3.11 before publication.
+#
+# This is NOT a fully artifact-hashed or cross-platform lock. Installation is
+# deliberately restricted to binary distributions, but their wheel hashes are
+# not recorded. See provenance/V9R2R1_ENVIRONMENT_SPEC.json.
+--only-binary=:all:
+
+colorama==0.4.6 ; sys_platform == "win32"
+cffi==2.0.0
+cryptography==46.0.5
+iniconfig==2.3.0
+packaging==25.0
+pip==26.0.1
+pluggy==1.6.0
+pycparser==2.23
+pygments==2.20.0
+pytest==9.1.1
+setuptools==70.2.0
+wheel==0.46.3

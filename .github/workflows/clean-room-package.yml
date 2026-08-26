@@ -1,0 +1,132 @@
+name: V9R2R1 clean-room package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-wheel-and-clean-install:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.15"
+          cache: pip
+          cache-dependency-path: requirements/base.lock
+
+      - name: Install exact base version closure
+        shell: pwsh
+        run: |
+          python -m pip install --no-deps -r requirements/base.lock
+          if ($LASTEXITCODE -ne 0) { throw 'base lock installation failed' }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'pip check failed' }
+
+      - name: Build wheel twice and compare bytes
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $wheelA = Join-Path $env:RUNNER_TEMP 'wheel-a'
+          $wheelB = Join-Path $env:RUNNER_TEMP 'wheel-b'
+          New-Item -ItemType Directory -Path $wheelA, $wheelB | Out-Null
+          $env:SOURCE_DATE_EPOCH = '1700000000'
+          python -m pip wheel . --no-deps --no-build-isolation --wheel-dir $wheelA
+          if ($LASTEXITCODE -ne 0) { throw 'wheel build A failed' }
+          python -m pip wheel . --no-deps --no-build-isolation --wheel-dir $wheelB
+          if ($LASTEXITCODE -ne 0) { throw 'wheel build B failed' }
+          $a = Get-ChildItem -LiteralPath $wheelA -Filter 'mo_nco-0.21.3.14-*.whl' -File
+          $b = Get-ChildItem -LiteralPath $wheelB -Filter 'mo_nco-0.21.3.14-*.whl' -File
+          if (@($a).Count -ne 1 -or @($b).Count -ne 1) { throw 'expected exactly one wheel in each build' }
+          $hashA = (Get-FileHash -Algorithm SHA256 -LiteralPath $a.FullName).Hash.ToLowerInvariant()
+          $hashB = (Get-FileHash -Algorithm SHA256 -LiteralPath $b.FullName).Hash.ToLowerInvariant()
+          if ($hashA -ne $hashB) { throw "non-deterministic wheels: $hashA != $hashB" }
+          "WHEEL_PATH=$($a.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WHEEL_SHA256=$hashA" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build, normalize, and compare source distributions
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $rawA = Join-Path $env:RUNNER_TEMP 'sdist-raw-a'
+          $rawB = Join-Path $env:RUNNER_TEMP 'sdist-raw-b'
+          $normalized = Join-Path $env:RUNNER_TEMP 'sdist-normalized'
+          $fromSdist = Join-Path $env:RUNNER_TEMP 'wheel-from-sdist'
+          New-Item -ItemType Directory -Path $rawA, $rawB, $normalized, $fromSdist | Out-Null
+          $env:SOURCE_DATE_EPOCH = '1700000000'
+
+          python -c "import setuptools.build_meta as backend; backend.build_sdist(r'$rawA')"
+          if ($LASTEXITCODE -ne 0) { throw 'raw sdist build A failed' }
+          python -c "import setuptools.build_meta as backend; backend.build_sdist(r'$rawB')"
+          if ($LASTEXITCODE -ne 0) { throw 'raw sdist build B failed' }
+          $inputA = Get-ChildItem -LiteralPath $rawA -Filter 'mo_nco-0.21.3.14.tar.gz' -File
+          $inputB = Get-ChildItem -LiteralPath $rawB -Filter 'mo_nco-0.21.3.14.tar.gz' -File
+          if (@($inputA).Count -ne 1 -or @($inputB).Count -ne 1) { throw 'expected one raw sdist per build' }
+
+          $sdistA = Join-Path $normalized 'mo_nco-0.21.3.14-a.tar.gz'
+          $sdistB = Join-Path $normalized 'mo_nco-0.21.3.14-b.tar.gz'
+          python scripts/normalize_reproducible_sdist.py --input $inputA.FullName --output $sdistA --epoch 1700000000
+          if ($LASTEXITCODE -ne 0) { throw 'sdist normalization A failed' }
+          python scripts/normalize_reproducible_sdist.py --input $inputB.FullName --output $sdistB --epoch 1700000000
+          if ($LASTEXITCODE -ne 0) { throw 'sdist normalization B failed' }
+          $sdistHashA = (Get-FileHash -Algorithm SHA256 -LiteralPath $sdistA).Hash.ToLowerInvariant()
+          $sdistHashB = (Get-FileHash -Algorithm SHA256 -LiteralPath $sdistB).Hash.ToLowerInvariant()
+          if ($sdistHashA -ne $sdistHashB) { throw "non-deterministic normalized sdists: $sdistHashA != $sdistHashB" }
+
+          python -m pip wheel $sdistA --no-deps --no-build-isolation --wheel-dir $fromSdist
+          if ($LASTEXITCODE -ne 0) { throw 'wheel rebuild from normalized sdist failed' }
+          $rebuilt = Get-ChildItem -LiteralPath $fromSdist -Filter 'mo_nco-0.21.3.14-*.whl' -File
+          if (@($rebuilt).Count -ne 1) { throw 'expected one wheel rebuilt from normalized sdist' }
+          $rebuiltHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $rebuilt.FullName).Hash.ToLowerInvariant()
+          if ($rebuiltHash -ne $env:WHEEL_SHA256) { throw "sdist-to-wheel identity drift: $rebuiltHash != $env:WHEEL_SHA256" }
+          "SDIST_PATH=$sdistA" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "SDIST_SHA256=$sdistHashA" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Install and exercise outside the repository
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $venv = Join-Path $env:RUNNER_TEMP 'clean-venv'
+          python -m venv $venv
+          $cleanPython = Join-Path $venv 'Scripts\python.exe'
+          & $cleanPython -m pip install --no-deps $env:WHEEL_PATH
+          if ($LASTEXITCODE -ne 0) { throw 'clean wheel install failed' }
+          & $cleanPython -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'clean pip check failed' }
+          $outside = Join-Path $env:RUNNER_TEMP 'outside-repository'
+          New-Item -ItemType Directory -Path $outside | Out-Null
+          Push-Location $outside
+          try {
+            & $cleanPython -W error::RuntimeWarning -c "import pathlib,mo_nco; assert mo_nco.__version__ == '0.21.3.14'; assert 'site-packages' in pathlib.Path(mo_nco.__file__).as_posix()"
+            if ($LASTEXITCODE -ne 0) { throw 'outside-repository import failed' }
+            $gateReceipt = Join-Path $env:RUNNER_TEMP 'installed-gate.json'
+            & $cleanPython -W error::RuntimeWarning -m mo_nco.pareto_v21e3r1_v9_gate `
+              --expected-protocol-file-sha256 112bbe405c64fbe598275f27a0ae7262a4e68e85469052e559de722066ef15ad `
+              --output $gateReceipt
+            if ($LASTEXITCODE -ne 2) { throw "canonical gate must HOLD with exit 2, got $LASTEXITCODE" }
+            $gate = Get-Content -Raw -LiteralPath $gateReceipt | ConvertFrom-Json
+            if ($gate.status -ne 'PRE_DEVELOPMENT_HOLD' -or $gate.development_rows_materialized -ne 0) {
+              throw 'installed canonical HOLD boundary drifted'
+            }
+          } finally {
+            Pop-Location
+          }
+          Write-Host "PASS deterministic wheel $env:WHEEL_SHA256, normalized sdist $env:SDIST_SHA256, and clean install; scientific gate remains HOLD."
+
+      - name: Upload deterministic wheel and gate receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9r2r1-clean-room-package
+          path: |
+            ${{ runner.temp }}/wheel-a/*.whl
+            ${{ runner.temp }}/sdist-normalized/*-a.tar.gz
+            ${{ runner.temp }}/installed-gate.json
+          if-no-files-found: warn

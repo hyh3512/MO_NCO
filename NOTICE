@@ -1,0 +1,31 @@
+MO_NCO V21E3R1 V9R2R1 engineering reproduction candidate
+Copyright (c) 2026 hyh3512 and contributors. All rights reserved.
+
+Repository identity
+-------------------
+
+Distribution: mo-nco
+Version: 0.21.3.14
+Revision: V21E3R1_V9R2R1
+For citation and audit, record the exact Git commit used; this file does not
+self-reference a mutable branch head.
+Frozen 203-file source-tree SHA-256:
+50ad30da8670eb488848e6db084084185fea7725e86c7fea480639caa193d9eb
+
+This repository is made visible for engineering inspection. The accompanying
+LICENSE is an all-rights-reserved, no-license-grant notice. Visibility and
+citation metadata do not create permission to reuse or redistribute the work
+and do not satisfy an open-science license requirement.
+
+Evidence boundary
+-----------------
+
+The repository contains engineering code, tests, synthetic golden fixtures,
+exposed-development cases, and scoped engineering evidence. It does not
+contain or authorize selection, confirmation, formal-study, or submission
+artifacts. Repository-wide green, scientific independence, independent
+algorithm production, external custody, and environment lock are not
+established.
+
+Third-party components are not relicensed by this notice. See
+THIRD_PARTY_NOTICES.md.

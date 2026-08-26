@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: >-
+  If you refer to this engineering inspection snapshot, cite this software
+  record and identify the exact Git commit. Citation does not grant a license
+  or establish scientific independence, formal evidence, or publication
+  authority.
+title: "MO_NCO V21E3R1 V9R2R1 engineering reproduction candidate"
+type: software
+authors:
+  - name: "hyh3512"
+version: "0.21.3.14"
+date-released: 2026-08-26
+repository-code: "https://github.com/hyh3512/MO_NCO"
+abstract: >-
+  An engineering-reproduction candidate for multi-objective combinatorial
+  optimization code, tests, exposed-development fixtures, and fail-closed
+  evidence boundaries. Cite the exact Git commit separately. It is not an
+  independently reproduced scientific release and does not authorize
+  selection, confirmation, formal study, or submission.
+keywords:
+  - multi-objective optimization
+  - combinatorial optimization
+  - engineering reproducibility
+  - fail-closed evidence

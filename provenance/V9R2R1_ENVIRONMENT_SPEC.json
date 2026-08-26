@@ -1,0 +1,220 @@
+{
+  "authorization_boundaries": {
+    "confirmation_authorized": false,
+    "formal_authorized": false,
+    "full_development_matrix_authorized": false,
+    "ijoc_submission_authorized": false,
+    "scientific_independence": false,
+    "selection_authorized": false
+  },
+  "base_environment_observation": {
+    "active_direct_roots": {
+      "pip": "26.0.1",
+      "pytest": "9.1.1",
+      "setuptools": "70.2.0",
+      "wheel": "0.46.3"
+    },
+    "architecture": "64bit WindowsPE",
+    "blas": {
+      "backend": "mkl-sdl",
+      "detected_version": "2025",
+      "lapack_backend": "mkl-sdl",
+      "numpy_import_version": "2.4.4"
+    },
+    "compiler": "MSC v.1942 64 bit (AMD64)",
+    "executable": "C:\\miniconda3\\envs\\ssm_env\\python.exe",
+    "executable_bytes": 105288,
+    "executable_sha256": "418228fb1417da15512fc44aba6f2e1d948786878ffd06fd661881c6d104c0f6",
+    "implementation": "CPython",
+    "incidental_distribution_inconsistency": {
+      "base_lock_dependency": false,
+      "distribution": "numpy",
+      "import_version": "2.4.4",
+      "metadata_version": "2.4.3",
+      "status": "HOLD_METADATA_AND_IMPORTED_CODE_VERSION_DISAGREE"
+    },
+    "machine": "AMD64",
+    "operating_system": {
+      "build": "26200",
+      "platform": "Windows-10-10.0.26200-SP0",
+      "product": "Windows 10 Home China"
+    },
+    "python_version": "3.11.15",
+    "python_version_full": "3.11.15 | packaged by Anaconda, Inc. | (main, Mar 11 2026, 17:12:15) [MSC v.1942 64 bit (AMD64)]",
+    "thread_control_environment": {
+      "BLIS_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null,
+      "NUMEXPR_NUM_THREADS": null,
+      "OMP_NUM_THREADS": null,
+      "OPENBLAS_NUM_THREADS": null,
+      "VECLIB_MAXIMUM_THREADS": null
+    }
+  },
+  "evidence": {
+    "full_repository_junit": {
+      "errors": 0,
+      "failures": 8,
+      "path": "evidence/v9r2r1_environment_recovery_20260825_002/full_repository.junit.xml",
+      "sha256": "a45e5a8e97b7bdb739c8d2a82085e5a7fc0134ab9ecc961cad7e657bd5dc7784",
+      "skipped": 4,
+      "testcases": 1356
+    },
+    "full_suite_environment_preflight": {
+      "path": "evidence/v9r2r1_environment_recovery_20260825_002/full_suite_environment_preflight.json",
+      "receipt_payload_sha256": "92cdd91d9c40099e8142ae8ece0ae2dc3d0ee9185e751092a82d113112e3899a",
+      "sha256": "1ec262b90e40f8ecb675d2ecf2f9751d042c167a92bf56afef91f5350c47112e",
+      "status": "PASS_FULL_SUITE_ENVIRONMENT_PREFLIGHT"
+    },
+    "pymoo_environment_recovery_junit": {
+      "errors": 0,
+      "failures": 0,
+      "path": "evidence/v9r2r1_environment_recovery_20260825_002/pymoo_environment_recovery.junit.xml",
+      "sha256": "d53ac98d2af82f7624db229a960633bf0f7b54d24b9f583cf6abea5ffb23e137",
+      "skipped": 0,
+      "testcases": 5
+    },
+    "targeted_junit": {
+      "errors": 0,
+      "failures": 0,
+      "path": "evidence/v9r2r1_environment_recovery_20260825_002/targeted_final.junit.xml",
+      "sha256": "58fe04436e81335dc22c5fb5971e09ebf2fb5fa85a176a8a69ee06235d44f79b",
+      "skipped": 0,
+      "testcases": 271
+    }
+  },
+  "full_suite_environment_observation": {
+    "active_direct_roots": {
+      "moocore": "0.3.1",
+      "pip": "26.0.1",
+      "pymoo": "0.6.1.6",
+      "pytest": "9.1.1",
+      "setuptools": "80.10.2",
+      "wheel": "0.46.3"
+    },
+    "backend_imports_passed": [
+      "moocore",
+      "pymoo.algorithms.moo.moead",
+      "pymoo.algorithms.moo.nsga2"
+    ],
+    "executable": "C:\\miniconda3\\python.exe",
+    "executable_bytes": 105288,
+    "executable_sha256": "f77193cf0405ab440c39324bdb2f8864596321c1df888adbbe357f3d760f4716",
+    "native_artifacts": [
+      {
+        "bytes": 147456,
+        "distribution": "moocore",
+        "relative_suffix": "moocore/_libmoocore.pyd",
+        "sha256": "df7dde6e737fe1e1296665e9c17994041ec2a57f214b14a6b595a55ab2b2d8b3"
+      },
+      {
+        "bytes": 142336,
+        "distribution": "pymoo",
+        "relative_suffix": "pymoo/functions/compiled/calc_perpendicular_distance.cp313-win_amd64.pyd",
+        "sha256": "8c3403fdea8191a58ddf7907ef7293cb376a41f44a76f2d9399804483ab07ba6"
+      },
+      {
+        "bytes": 157696,
+        "distribution": "pymoo",
+        "relative_suffix": "pymoo/functions/compiled/decomposition.cp313-win_amd64.pyd",
+        "sha256": "5740487c7aa01a55f7ab67f5d31933967d2fa5830a79efbe8b68120e766e7f67"
+      },
+      {
+        "bytes": 29184,
+        "distribution": "pymoo",
+        "relative_suffix": "pymoo/functions/compiled/info.cp313-win_amd64.pyd",
+        "sha256": "6efd33841c5a0405feba478e15276c3a97658893a219825b588be37b363e8b8d"
+      },
+      {
+        "bytes": 176640,
+        "distribution": "pymoo",
+        "relative_suffix": "pymoo/functions/compiled/mnn.cp313-win_amd64.pyd",
+        "sha256": "3216eb911fa9b6bf8a757dcb084ff276e1f71d95ecdef4afb0659bcb439d60d4"
+      },
+      {
+        "bytes": 214528,
+        "distribution": "pymoo",
+        "relative_suffix": "pymoo/functions/compiled/non_dominated_sorting.cp313-win_amd64.pyd",
+        "sha256": "d0f88d59391d3ac975fed3ccb6d918940b4c2c6e544192e7df6fe79840236eda"
+      },
+      {
+        "bytes": 167936,
+        "distribution": "pymoo",
+        "relative_suffix": "pymoo/functions/compiled/pruning_cd.cp313-win_amd64.pyd",
+        "sha256": "02c2ad9e32e1a435c85648b68f83243bc3874658a4fe76758537a9703c281b0d"
+      },
+      {
+        "bytes": 143872,
+        "distribution": "pymoo",
+        "relative_suffix": "pymoo/functions/compiled/stochastic_ranking.cp313-win_amd64.pyd",
+        "sha256": "a76dafe06507f3a357377db53ce9a5f8e4b15bb33c35a5fbe5875ee82aed2ef3"
+      }
+    ],
+    "python_version": "3.13.12",
+    "python_version_full": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:05:56) [MSC v.1942 64 bit (AMD64)]",
+    "status": "PASS_OBSERVED_RECOVERY_ENVIRONMENT_ONLY"
+  },
+  "identity": {
+    "distribution": "mo-nco",
+    "revision": "V21E3R1_V9R2R1",
+    "version": "0.21.3.14"
+  },
+  "test_dependency_contract": {
+    "base_evidence_environment_at_observation": {
+      "cryptography_installed": false,
+      "status": "REPAIRED_IN_PUBLIC_LOCK_AFTER_FROZEN_ENVIRONMENT_OBSERVATION"
+    },
+    "full_suite_environment_current_audit": {
+      "cffi": "2.0.0",
+      "cryptography": "46.0.5",
+      "pycparser": "2.23"
+    },
+    "full_test_optional_backends": {
+      "moocore": "0.3.1",
+      "pymoo": "0.6.1.6",
+      "torch": "OPTIONAL_SKIP_PER_EXISTING_TEST_CONTRACT"
+    },
+    "locked_test_import_closure": {
+      "cffi": "2.0.0",
+      "cryptography": "46.0.5",
+      "pycparser": "2.23",
+      "pytest_base": "9.1.1",
+      "pytest_full_suite": "9.1.1"
+    },
+    "package_metadata_boundary": {
+      "authoritative_public_ci_dependency_files": [
+        "requirements/base.lock",
+        "requirements/optional-pymoo.lock"
+      ],
+      "pyproject_source_identity_sha256": "87dd63c106eada22335d725a4eba24474d341237f2e2546850a0decab467c4f6",
+      "pyproject_test_extra_is_standalone_full_suite": false,
+      "reason": "PYPROJECT_IS_PART_OF_FROZEN_203_FILE_V9R2R1_SOURCE_IDENTITY_TEST_AND_RECEIPT_EXTRAS_REMAIN_SEPARATE"
+    },
+    "status": "PASS_VERSION_PINNED_TEST_IMPORT_CLOSURE_ONLY",
+    "unconditional_external_collection_imports": [
+      "cryptography",
+      "pytest"
+    ]
+  },
+  "lock_state": {
+    "anaconda_build_strings_locked": false,
+    "base_active_version_closure_pinned": true,
+    "conda_channel_repodata_locked": false,
+    "cross_platform_lock_complete": false,
+    "environment_lock_requirement_satisfied": false,
+    "github_actions_are_exact_reproduction": false,
+    "native_abi_and_code_integrity_policy_portable": false,
+    "optional_pymoo_active_version_closure_pinned": true,
+    "package_distribution_artifact_hashes_complete": false,
+    "python_distribution_artifact_hash_locked": false,
+    "requirements_text_integrity_manifest_present": true,
+    "status": "HOLD_VERSION_PINNED_ARTIFACT_HASHES_AND_PLATFORM_LOCK_INCOMPLETE"
+  },
+  "observed_at_utc": "2026-08-26T13:40:02Z",
+  "requirements": {
+    "base.in": "1e3840ff2a38c10f1745119aed6a32da4489bfc0854ee86892f39f1e5602d2be",
+    "base.lock": "ddd9b9e01f1a30731f7224beea7ce3cad00c9e6a124c778db14913c24beb933c",
+    "optional-pymoo.in": "a424d2773ec31fceb523bbc03a79c418936214500b706e12c9503f8e9745c520",
+    "optional-pymoo.lock": "48f5c22d8034bed19d0e999ab4e9064bd32e018d0127eda08efa159dbc65b590"
+  },
+  "schema": "v21e3r1_v9r2r1_environment_spec_v1"
+}

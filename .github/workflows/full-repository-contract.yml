@@ -1,0 +1,130 @@
+name: V9R2R1 full repository contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_full_live:
+        description: Run the complete public-checkout suite instead of reference-evidence replay only
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  exact-reference-evidence:
+    name: Byte-bound exact-eight reference evidence
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.12"
+
+      - name: Verify reference JUnit bytes and exact historical node-ids
+        shell: pwsh
+        run: |
+          $receipt = Join-Path $env:RUNNER_TEMP 'expected-historical-v8-failures.json'
+          python scripts/verify_expected_historical_failure_set.py `
+            --registry provenance/V9R2R1_EXPECTED_HISTORICAL_V8_FAILURE_SET.json `
+            --junit evidence/v9r2r1_environment_recovery_20260825_002/full_repository.junit.xml `
+            --require-reference-sha256 `
+            --output $receipt
+          if ($LASTEXITCODE -ne 0) { throw 'reference exact-eight evidence drifted' }
+          Write-Host 'PASS byte-bound historical engineering reference; repository-wide green remains FALSE.'
+
+      - name: Upload reference verification receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9r2r1-exact-eight-reference
+          path: ${{ runner.temp }}/expected-historical-v8-failures.json
+          if-no-files-found: error
+
+  full-repository-contract:
+    name: Full-live exact eight or fail closed
+    if: ${{ inputs.run_full_live }}
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.12"
+          cache: pip
+          cache-dependency-path: requirements/optional-pymoo.lock
+
+      - name: Verify requirement-file checksums
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($line in Get-Content -LiteralPath requirements/locks.sha256) {
+            if ($line -notmatch '^([0-9a-f]{64})  (.+)$') { throw "invalid locks.sha256 line: $line" }
+            $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $Matches[2]).Hash.ToLowerInvariant()
+            if ($actual -ne $Matches[1]) { throw "lock checksum mismatch: $($Matches[2])" }
+          }
+
+      - name: Install observed full-suite version closure
+        shell: pwsh
+        run: |
+          python -m pip install --no-deps -r requirements/optional-pymoo.lock
+          if ($LASTEXITCODE -ne 0) { throw 'optional pymoo lock installation failed' }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'pip check failed' }
+          python -c "from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey; import moocore, pytest, pymoo"
+          if ($LASTEXITCODE -ne 0) { throw 'full test-import closure failed' }
+
+      - name: Fail-fast backend preflight
+        shell: pwsh
+        run: |
+          $python = (Get-Command python).Source
+          $receipt = Join-Path $env:RUNNER_TEMP 'full_suite_environment_preflight.json'
+          python scripts/check_v9r2r1_full_suite_environment.py `
+            --expected-python-executable $python `
+            --expected-python-version-prefix 3.13.12 `
+            --expected-pymoo-version 0.6.1.6 `
+            --expected-moocore-version 0.3.1 `
+            --output $receipt
+          if ($LASTEXITCODE -ne 0) { throw 'HOLD_FULL_SUITE_ENVIRONMENT' }
+          Write-Warning 'This CI environment is version-pinned but is not the artifact-hashed Anaconda recovery environment.'
+
+      - name: Re-run pymoo recovery seam
+        shell: pwsh
+        run: |
+          python -m pytest -q -p no:cacheprovider --tb=short `
+            --junitxml="$env:RUNNER_TEMP\pymoo-recovery.junit.xml" `
+            tests/test_external_pymoo_baseline.py `
+            tests/test_ijoc_algorithm_adapters.py `
+            -k pymoo
+          if ($LASTEXITCODE -ne 0) { throw 'pymoo recovery regression failed' }
+
+      - name: Run and classify full repository suite
+        shell: pwsh
+        run: |
+          $junit = Join-Path $env:RUNNER_TEMP 'full-repository.junit.xml'
+          $receipt = Join-Path $env:RUNNER_TEMP 'expected-historical-v8-failures.json'
+          python -m pytest -q -p no:cacheprovider --tb=short --junitxml=$junit
+          $pytestExit = $LASTEXITCODE
+          if ($pytestExit -ne 1) { throw "expected pytest exit 1 for the frozen V8 drift set, got $pytestExit" }
+          python scripts/verify_expected_historical_failure_set.py `
+            --registry provenance/V9R2R1_EXPECTED_HISTORICAL_V8_FAILURE_SET.json `
+            --junit $junit `
+            --output $receipt
+          if ($LASTEXITCODE -ne 0) { throw 'exact historical failure node-id contract drifted' }
+          Write-Host 'PASS_EXPECTED_FROZEN_V8_FAILURE_SET: 8 failures, 0 errors, 4 skips.'
+          Write-Warning 'Repository-wide green remains FALSE; failures were executed and were not xfailed or skipped.'
+
+      - name: Upload environment and JUnit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9r2r1-full-repository-contract
+          path: |
+            ${{ runner.temp }}/full_suite_environment_preflight.json
+            ${{ runner.temp }}/pymoo-recovery.junit.xml
+            ${{ runner.temp }}/full-repository.junit.xml
+            ${{ runner.temp }}/expected-historical-v8-failures.json
+          if-no-files-found: warn

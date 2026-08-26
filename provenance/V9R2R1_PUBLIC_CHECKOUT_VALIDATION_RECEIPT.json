@@ -1,0 +1,111 @@
+{
+  "authorization_boundaries": {
+    "confirmation_authorized": false,
+    "environment_lock_requirement_satisfied": false,
+    "formal_authorized": false,
+    "full_development_matrix_authorized": false,
+    "ijoc_submission_authorized": false,
+    "open_science_license_present": false,
+    "repository_wide_green": false,
+    "scientific_independence": false,
+    "selection_authorized": false
+  },
+  "dependency_environment": {
+    "artifact_hashed_cross_platform_lock_complete": false,
+    "observed_version_closures_install_and_pip_check": "PASS",
+    "python_311_collection": 1408,
+    "python_311_dependency_contract_passed": 3,
+    "python_313_collection": 1408,
+    "python_313_dependency_contract_passed": 3,
+    "requirements_integrity_manifest_sha256": "217bef8f7773bd87481e80878c0286642a41ae928801243977a1ad1827475064",
+    "specification_sha256": "e68a51f53988643b4c04e6df4715c7a57aaaf177e0cb022748454d65ba0d68cb"
+  },
+  "full_public_checkout_observation": {
+    "failure_classification": {
+      "frozen_v8_fail_closed_outcomes": 7,
+      "held_or_rights_sensitive_dependency_outcomes": 70,
+      "sealed_output_outcomes": 1,
+      "unclassified_outcomes": 0,
+      "validator_logic_bug_demonstrated": false
+    },
+    "historical_exact_eight_registry_matches_public_checkout": false,
+    "interpreter": "CPython 3.13.12",
+    "junit": {
+      "bytes": 327539,
+      "failure_or_error_testcases": 77,
+      "multiple_terminal_outcome_testcases": 1,
+      "passed_testcases": 1327,
+      "sha256": "59f06b948f393f32a33be2caf0fefa0081a4c9b8151ca08f4fac313e8db272da",
+      "skipped_testcases": 4,
+      "testcases": 1408,
+      "unique_failure_node_id_count": 77,
+      "unique_failure_node_ids_sha256": "0124a018b5b2c7c253a3f364d4f5e5d3b62b7a264b98a5c7e6a1679700656491"
+    },
+    "log": {
+      "bytes": 97357,
+      "sha256": "24f54e9ce5ab2072b950f9e41bedc85c271bc388be2ba0149ce68b8e77a190e3"
+    },
+    "pytest_summary": "78 failed, 1328 passed, 4 skipped, 267 subtests passed in 595.57s",
+    "raw_junit_and_log_published": false,
+    "raw_output_hold_reason": "LOCAL_ABSOLUTE_PATHS",
+    "status": "FAIL_CLOSED_WITHHELD_ARTIFACT_AND_RIGHTS_BOUNDARY"
+  },
+  "identity": {
+    "distribution": "mo-nco",
+    "revision": "V21E3R1_V9R2R1",
+    "version": "0.21.3.14"
+  },
+  "observed_at_utc": "2026-08-26T15:20:21Z",
+  "package_rebuild": {
+    "clean_install_outside_repository": "PASS",
+    "installed_gate_exit_code": 2,
+    "installed_gate_sha256": "f425342c3bdc2bd753a2fa65ea43beccfc623a0404ad4ff8c987b6520143391a",
+    "installed_gate_status": "PRE_DEVELOPMENT_HOLD",
+    "normalized_sdist_bytes": 1117402,
+    "normalized_sdist_rebuilds_byte_identical": true,
+    "normalized_sdist_sha256": "a1bf2c9dd3de6f51cd477d30acf43d4ace84b72a74081829281a3f02e9a44c1f",
+    "release_artifacts_uploaded_to_git": false,
+    "sdist_to_wheel_byte_identical": true,
+    "wheel_bytes": 879642,
+    "wheel_rebuilds_byte_identical": true,
+    "wheel_sha256": "f0d1d8cf3e77d6f92967625d141b78158c1039ba39e098372b0019601fe4c31c"
+  },
+  "public_dependency_disposition": {
+    "included_safe_direct_dependencies": 11,
+    "inventory_sha256": "0dc135b8a485ca17cba87cd72b428377514661b102fbc12f315ca22ba58d3f37",
+    "prohibited_direct_dependencies": 29,
+    "rights_ambiguous_direct_dependencies": 4,
+    "safe_material_included": true,
+    "withheld_material_uploaded": false
+  },
+  "public_export_classification": "PASS_ENGINEERING_CHECKLIST_EXPORT_CANDIDATE_ONLY",
+  "scoped_engineering_observation": {
+    "engineering_envelope_sha256": "eb7613c9c0ee31fc36af49d75d05c0ce0df98c19010577ba9e2f20a9ec9e76e4",
+    "mode": "ScopedLive",
+    "passed": 271,
+    "targeted_junit_sha256": "0cd7b72292ab8c9445cfd4a40eab0154ece9119ce24f55cc7fcba770522543ff",
+    "testcases": 271
+  },
+  "schema": "v21e3r1_v9r2r1_public_checkout_validation_receipt_v1",
+  "source_identity": {
+    "file_count": 203,
+    "manifest_payload_sha256": "6ef0d91ce797d568bded1dff321c74193a088d05473b29870534150089e30b06",
+    "manifest_sha256": "7e5bc5557f1e32df4f91b2d8cf13ab36b9c0075adfe5e141266b90be446b5304",
+    "source_tree_sha256": "50ad30da8670eb488848e6db084084185fea7725e86c7fea480639caa193d9eb",
+    "verification_status": "PASS_CURRENT_SOURCE_MANIFEST"
+  },
+  "status": "PASS_PUBLIC_ENGINEERING_CHECKLIST_EXPORT_CANDIDATE__HOLD_PRIVATE_ARTIFACT_CLOSURE",
+  "test_source_closure": {
+    "files_root_sha256": "55850b6bc1e75c50ce8aef7efd54dc7841e7d2b8f8ab467bc911fc5235fa8e86",
+    "manifest_payload_sha256": "6823a393fcb3f5f0c5bc5da51974abbb0794b6bf83aabfc4efa7f0c8701d742c",
+    "manifest_sha256": "2ba15a1c516924a51b3574c3c606742fab5bfd4e4c4e752095e8a95c55b91952",
+    "module_count": 136,
+    "selection": "ALL_CURRENT_TESTS_TEST_STAR_PY"
+  },
+  "v8_frozen_tag": {
+    "archive_published": false,
+    "public_redistribution_authorized": false,
+    "status_manifest_sha256": "1a2f6889a6cad30b78deb4aa83ccc70da7501a4201a557fcdbc134cd29780ae3",
+    "tag_published": false
+  }
+}

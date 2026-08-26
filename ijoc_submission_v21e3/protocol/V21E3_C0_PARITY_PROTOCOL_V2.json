@@ -1,0 +1,172 @@
+{
+  "schema": "pareto_v21e3_c0_parity_protocol_v2",
+  "status": "ENGINEERING_ADAPTERS_AVAILABLE_SUCCESSOR_SNAPSHOT_PENDING",
+  "successor_version": "V21e3r1",
+  "purpose": "development_only_C0_noninferiority_against_common_budget_NSGAII_and_MOEAD",
+  "scientific_scope": "engineering_preflight_not_performance_evidence",
+  "families": [
+    "MOTSP",
+    "MOKP"
+  ],
+  "common_execution_contract": {
+    "charged_evaluation_budget": 2000,
+    "checkpoint_period": 200,
+    "objective_call_semantics": "first_true_objective_evaluation_v1",
+    "attempt_history_semantics": "all_attempts_terminal_receipt_v1",
+    "duplicate_policy": "exact_solution_cache_zero_charge_retry_then_fallback_v1",
+    "duplicate_retry_cap": 4,
+    "retry_policy": "same_family_single_perturbation_v1",
+    "fallback_attempt_cap": 16,
+    "fallback_policy": "problem_native_exact_random_solution_v1",
+    "archive_policy": "unbounded_exact_nondominated_all_unique_evaluations_v1",
+    "checkpoint_policy": "genuine_archive_snapshot_on_charged_evaluation_grid_v1",
+    "failure_policy": "durable_terminal_failure_on_objective_contract_or_retry_exhaustion_v1",
+    "duplicate_identity": "exact_integer_solution_tuple_v1",
+    "algorithm_rng_policy": "repository_single_python_random_seed_stream_v1",
+    "duplicate_rng_policy": "domain_separated_retry_and_fallback_streams_v1",
+    "runtime_claim_authorized": false
+  },
+  "candidate_reference_directions": {
+    "count": 21,
+    "policy": "v21e3_candidate_positive_evenly_spaced_biobjective_v1",
+    "source_binding": {
+      "path": "ijoc_submission_v21e3/development_manifests_v1/config_manifest_development.json",
+      "bytes": 1719,
+      "sha256": "d33ba2d83909af4fecff85f4663791b7c63b5ed56738a67f0eec6ccfd6336d4e"
+    },
+    "source_field": "reference_directions"
+  },
+  "arms": {
+    "V21E3_C0": {
+      "implementation": "mo_nco.pareto_v21e3_hybrid.V21E3TypedHybridParetoSearch",
+      "candidate_id": "C0",
+      "execution_adapter_status": "DEVELOPMENT_ONLY_AVAILABLE",
+      "initialization": "mokp_profit_density_or_motsp_weighted_nearest_neighbor_construction_v21e3",
+      "population_size": 21,
+      "source_binding_status": "PENDING_SUCCESSOR_FULL_SNAPSHOT"
+    },
+    "NSGAII": {
+      "implementation": "mo_nco.pareto_v21e3_baselines.run_v21e3_development_baseline",
+      "execution_adapter_status": "DEVELOPMENT_ONLY_AVAILABLE",
+      "adaptation_identity": "prospective_generation_batched_first_true_adaptation_of_repository_baseline_v1",
+      "repository_baseline_deviation_scope": "first_true_budget_duplicate_trace_and_cumulative_measurement_archive_seam_only_v1",
+      "survival_policy": "nondominated_rank_then_crowding_stable_index_v1",
+      "survival_schedule": "generation_batched_full_then_frozen_partial_survival_v1",
+      "family_configurations": {
+        "MOTSP": {
+          "population_size": 48,
+          "selection_policy": "repository_distinct_binary_tournament_rank_crowding_sampled_left_tie_v1",
+          "initialization_policy": "problem_native_exact_random_solution_v1",
+          "crossover_policy": "repository_fixed_origin_order_crossover_v1",
+          "mutation_policy": "repository_two_opt_with_probability_0_35_v1",
+          "mutation_probability": 0.35,
+          "repair_policy": "motsp_permutation_identity_repair_v1",
+          "reference_direction_count_for_context": 48,
+          "reference_direction_policy": "repository_motsp_positive_floor_1e3_evenly_spaced_v1"
+        },
+        "MOKP": {
+          "population_size": 40,
+          "selection_policy": "repository_with_replacement_binary_tournament_rank_crowding_stable_index_v1",
+          "initialization_policy": "problem_native_exact_random_solution_v1",
+          "crossover_policy": "repository_uniform_bit_crossover_v1",
+          "mutation_policy": "repository_one_over_n_bit_mutation_force_one_v1",
+          "mutation_rate_policy": "one_over_solution_size_v1",
+          "repair_policy": "repository_random_drop_capacity_repair_v1",
+          "reference_direction_count_for_context": 40,
+          "reference_direction_policy": "repository_mokp_evenly_spaced_endpoint_including_v1"
+        }
+      },
+      "source_binding_status": "PENDING_SUCCESSOR_FULL_SNAPSHOT",
+      "exact_command": "python -m mo_nco.pareto_v21e3_baselines --arm NSGAII --instance <bound-development-instance.json> --seed <frozen-seed> --budget 2000 --checkpoint-period 200 --source-snapshot-sha256 <pending-successor-source-snapshot-sha256> --output-directory <new-exclusive-output-directory>"
+    },
+    "MOEAD": {
+      "implementation": "mo_nco.pareto_v21e3_baselines.run_v21e3_development_baseline",
+      "execution_adapter_status": "DEVELOPMENT_ONLY_AVAILABLE",
+      "adaptation_identity": "prospective_steady_state_first_true_adaptation_of_repository_baseline_v1",
+      "repository_baseline_deviation_scope": "first_true_budget_duplicate_trace_and_cumulative_measurement_archive_seam_only_v1",
+      "survival_policy": "decomposition_replacement_is_survival_v1",
+      "update_schedule": "cyclic_one_subproblem_per_unique_evaluation_v1",
+      "scalarization": "repository_raw_dynamic_ideal_tchebycheff_v1",
+      "replacement_policy": "bounded_neighborhood_nonworse_tchebycheff_v1",
+      "replacement_order_policy": "neighborhood_order_stop_at_maximum_replacements_v1",
+      "family_configurations": {
+        "MOTSP": {
+          "population_size": 48,
+          "parent_selection_policy": "repository_uniform_one_neighborhood_parent_v1",
+          "initialization_policy": "problem_native_exact_random_solution_v1",
+          "crossover_policy": "disabled_single_neighborhood_parent_v1",
+          "mutation_policy": "repository_single_two_opt_v1",
+          "repair_policy": "motsp_permutation_identity_repair_v1",
+          "reference_direction_count": 48,
+          "reference_direction_policy": "repository_motsp_positive_floor_1e3_evenly_spaced_v1",
+          "neighborhood_size": 8,
+          "neighborhood_policy": "repository_squared_euclidean_reference_distance_stable_index_v1",
+          "scalar_weight_floor": 0.001,
+          "maximum_replacements": 8
+        },
+        "MOKP": {
+          "population_size": 40,
+          "parent_selection_policy": "repository_uniform_two_distinct_neighborhood_parents_v1",
+          "initialization_policy": "problem_native_exact_random_solution_v1",
+          "crossover_policy": "repository_uniform_bit_crossover_v1",
+          "mutation_policy": "repository_one_over_n_bit_mutation_force_one_v1",
+          "mutation_rate_policy": "one_over_solution_size_v1",
+          "repair_policy": "repository_random_drop_capacity_repair_v1",
+          "reference_direction_count": 40,
+          "reference_direction_policy": "repository_mokp_evenly_spaced_endpoint_including_v1",
+          "neighborhood_size": 8,
+          "neighborhood_policy": "repository_absolute_first_weight_distance_stable_index_v1",
+          "scalar_weight_floor": 0.000001,
+          "maximum_replacements": 8
+        }
+      },
+      "source_binding_status": "PENDING_SUCCESSOR_FULL_SNAPSHOT",
+      "exact_command": "python -m mo_nco.pareto_v21e3_baselines --arm MOEAD --instance <bound-development-instance.json> --seed <frozen-seed> --budget 2000 --checkpoint-period 200 --source-snapshot-sha256 <pending-successor-source-snapshot-sha256> --output-directory <new-exclusive-output-directory>"
+    }
+  },
+  "case_design": {
+    "manifest": "ijoc_submission_v21e3/development_partitions_v1/case_manifest.json",
+    "case_count_per_family": 6,
+    "sizes": [
+      100,
+      200,
+      500
+    ],
+    "cases_per_size_per_family": 2,
+    "seeds": [
+      31051,
+      31057,
+      31059
+    ],
+    "pairing": "same_case_same_seed_same_hardware_process_policy"
+  },
+  "runtime_and_dependency_contract": {
+    "python_implementation": "CPython",
+    "minimum_python": "3.10",
+    "external_algorithm_dependency": "NONE_STDLIB_AND_BOUND_MO_NCO_SOURCE_ONLY",
+    "executable_identity": "absolute_path_version_bytes_sha256_recorded_per_run_v1",
+    "argv_semantics": "module_entrypoint_and_all_flags_frozen_in_each_arm_exact_command_v1",
+    "successor_source_and_dependency_manifest": "PENDING_AFTER_ADAPTER_IMPLEMENTATION",
+    "runtime_efficiency_claim_authorized": false
+  },
+  "noninferiority_gate": {
+    "estimand": "case_cluster_mean_of_seed_averaged_C0_minus_comparator_normalized_hv_auc",
+    "margin": 0.005,
+    "bootstrap_samples": 20000,
+    "bootstrap_randomization_seed": 31061,
+    "tie_tolerance": 1e-12,
+    "failure_action": "STOP_BEFORE_SELECTION_PARTITION_MATERIALIZATION"
+  },
+  "preflight_gates": {
+    "baseline_adapter_unit_and_cli_smoke": "PASS_ENGINEERING_ONLY",
+    "target_scale_structural_and_adversarial_tests": "NOT_RUN",
+    "successor_source_snapshot": "PENDING",
+    "independent_protocol_preflight": "NOT_RUN",
+    "matched_matrix": "NOT_RUN",
+    "noninferiority": "NOT_ESTABLISHED",
+    "selection_entropy_release": "PROHIBITED",
+    "calibration_execution": "PROHIBITED",
+    "formal_execution": "PROHIBITED",
+    "formal_authorized": false
+  }
+}

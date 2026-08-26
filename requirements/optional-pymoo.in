@@ -1,0 +1,11 @@
+# Direct inputs for the V9R2R1 full-repository pymoo environment.
+# pymoo/moocore identities are bound by the checked-in recovery preflight
+# receipt. Exact transitive versions observed in that Python 3.13.12 Windows
+# environment are recorded in optional-pymoo.lock.
+pip==26.0.1
+pytest==9.1.1
+cryptography==46.0.5
+setuptools==80.10.2
+wheel==0.46.3
+pymoo==0.6.1.6
+moocore==0.3.1

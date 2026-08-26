@@ -1,0 +1,48 @@
+{
+  "schema": "annealed_pareto_smc_spec_v1",
+  "objective_box": {
+    "source": "analytic_distance_matrix_box",
+    "archive_independent": true
+  },
+  "epsilon_cells": {
+    "coordinate_system": "normalized_frozen_objective_box",
+    "widths": [0.05, 0.05],
+    "archive_independent": true,
+    "role": "reporting_and_coverage_only"
+  },
+  "reference_directions": [
+    [0.999, 0.001],
+    [0.875, 0.125],
+    [0.75, 0.25],
+    [0.625, 0.375],
+    [0.375, 0.625],
+    [0.25, 0.75],
+    [0.125, 0.875],
+    [0.001, 0.999]
+  ],
+  "target": {
+    "family": "typed_augmented_tchebycheff_gibbs",
+    "stage_frozen": true,
+    "beta_schedule": [0.0, 0.5, 1.5, 3.0, 6.0, 10.0],
+    "chebyshev_rho": 0.03
+  },
+  "resampling": {
+    "method": "multinomial",
+    "scope": "within_reference_type",
+    "ess_threshold_fraction": 0.9,
+    "ess_is_not_a_coverage_certificate": true
+  },
+  "mutation": {
+    "proposal": "uniform_symmetric_two_opt",
+    "acceptance": "exact_log_domain_mh",
+    "objective_evaluation": "full_tour"
+  },
+  "particle_allocation": {
+    "policy": "split_cli_population_equally_across_reference_types"
+  },
+  "reporting": {
+    "archive_role": "reporting_only",
+    "archive_max_size": 200,
+    "cell_ledger": "untruncated_first_evaluated_representative_per_cell"
+  }
+}

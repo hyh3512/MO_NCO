@@ -1,0 +1,8 @@
+# Direct inputs for the V9R2R1 scoped source, packaging, and test environment.
+# Evidence host: C:\miniconda3\envs\ssm_env\python.exe (CPython 3.11.15).
+# Exact transitive versions are recorded in base.lock.
+pip==26.0.1
+pytest==9.1.1
+cryptography==46.0.5
+setuptools==70.2.0
+wheel==0.46.3

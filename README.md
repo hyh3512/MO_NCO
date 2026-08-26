@@ -1,10 +1,35 @@
 # MO_NCO Engineering Prototype
 
-> This private repository currently contains the reviewed
-> `V21E3R1_V9R2R1` chat-access snapshot. Read
-> [`docs/GITHUB_CHAT_ACCESS_SCOPE.md`](docs/GITHUB_CHAT_ACCESS_SCOPE.md)
-> before interpreting the included engineering evidence. Full-repository green,
-> scientific independence, and later-phase authorization are explicitly false.
+> This public repository contains the reviewed `V21E3R1_V9R2R1`
+> engineering-reproduction candidate. Read
+> [`docs/V9R2R1_PUBLIC_RELEASE_BOUNDARY.md`](docs/V9R2R1_PUBLIC_RELEASE_BOUNDARY.md)
+> and [`docs/GITHUB_CHAT_ACCESS_SCOPE.md`](docs/GITHUB_CHAT_ACCESS_SCOPE.md)
+> before interpreting any evidence. The canonical 203-file source closure and
+> scoped engineering checks are reproducible; the public-checkout full suite is
+> not closed because historical fixtures and large evidence artifacts are not
+> publicly redistributable here. Repository-wide green, a complete artifact-
+> hashed environment lock, scientific independence, open-science licensing,
+> and every later-phase authorization are explicitly false.
+
+## V9R2R1 engineering-reproduction entry point
+
+- Canonical source identity: [`V21E3R1_V9R2R1_SOURCE_MANIFEST.json`](V21E3R1_V9R2R1_SOURCE_MANIFEST.json)
+  (`203` files; source-tree SHA-256
+  `50ad30da8670eb488848e6db084084185fea7725e86c7fea480639caa193d9eb`).
+- Complete commands and mode semantics: [`docs/V9R2R1_RUNBOOK.md`](docs/V9R2R1_RUNBOOK.md).
+- Public-release boundary: [`docs/V9R2R1_PUBLIC_RELEASE_BOUNDARY.md`](docs/V9R2R1_PUBLIC_RELEASE_BOUNDARY.md).
+- Exact historical failure registry and top-level envelope: [`provenance/`](provenance/).
+- Explicit included/prohibited/rights-ambiguous dependency disposition:
+  [`provenance/V9R2R1_PUBLIC_CHECKOUT_DEPENDENCY_DISPOSITION.json`](provenance/V9R2R1_PUBLIC_CHECKOUT_DEPENDENCY_DISPOSITION.json).
+- Final public-checkout validation receipt:
+  [`provenance/V9R2R1_PUBLIC_CHECKOUT_VALIDATION_RECEIPT.json`](provenance/V9R2R1_PUBLIC_CHECKOUT_VALIDATION_RECEIPT.json).
+
+The checked-in exact-eight JUnit is historical reference evidence. A fresh
+public checkout is deliberately not claimed to reproduce the full private
+artifact warehouse; run `FullLive` to test that boundary fail-closed. The final
+public-tree observation was `78 failed, 1328 passed, 4 skipped, 267 subtests
+passed`; all 78 outcomes are classified in the receipt and none authorizes a
+scientific or publication phase.
 
 This repository contains engineering implementations and falsification gates
 for the theory in `theory_corrected(4).tex`.

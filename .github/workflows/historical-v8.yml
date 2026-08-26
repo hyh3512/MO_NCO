@@ -1,0 +1,63 @@
+name: Historical V8 frozen-source gate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  require-and-test-frozen-v8-tag:
+    name: BLOCK unless immutable V8 tag exists and matches frozen identity
+    runs-on: windows-latest
+    timeout-minutes: 25
+    env:
+      V8_TAG: v21e3r1-v8-frozen
+      V8_SOURCE_ROOT_SHA256: 218bc398f04722d1da305928a9c206641f9b43d74b2afbc46c29ba1f08d6639b
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Preserve current full-suite lock for detached historical checkout
+        shell: pwsh
+        run: |
+          Copy-Item -LiteralPath requirements/optional-pymoo.lock -Destination "$env:RUNNER_TEMP\optional-pymoo.lock"
+
+      - name: Require annotated frozen V8 tag and identity binding
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git fetch --force --tags origin
+          $remote = @(git ls-remote --tags origin "refs/tags/$env:V8_TAG" "refs/tags/$env:V8_TAG^{}")
+          if ($remote.Count -eq 0) {
+            Write-Error "BLOCK_HISTORICAL_V8_TAG_MISSING: refs/tags/$env:V8_TAG does not exist. Do not xfail or skip the eight historical failures."
+            exit 2
+          }
+          $type = git cat-file -t "refs/tags/$env:V8_TAG"
+          if ($type -ne 'tag') { throw "V8 tag must be annotated; observed object type: $type" }
+          git grep -F --quiet $env:V8_SOURCE_ROOT_SHA256 "refs/tags/$env:V8_TAG" -- '*.json'
+          if ($LASTEXITCODE -ne 0) { throw 'frozen V8 source-root binding is absent from the tagged JSON evidence' }
+          git checkout --detach "refs/tags/$env:V8_TAG"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.12"
+
+      - name: Install full-suite version closure
+        shell: pwsh
+        run: |
+          python -m pip install --no-deps -r "$env:RUNNER_TEMP\optional-pymoo.lock"
+          if ($LASTEXITCODE -ne 0) { throw 'historical dependency installation failed' }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'historical pip check failed' }
+          python -c "from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey; import moocore, pytest, pymoo"
+          if ($LASTEXITCODE -ne 0) { throw 'historical test-import closure failed' }
+
+      - name: Execute historical recovery and tamper tests on their own source identity
+        shell: pwsh
+        run: |
+          python -m pytest -q -p no:cacheprovider --tb=short `
+            tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery.py `
+            tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py
+          if ($LASTEXITCODE -ne 0) { throw 'historical V8 tests failed on the frozen V8 tag' }
