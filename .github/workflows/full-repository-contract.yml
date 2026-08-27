@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: "3.13.12"
 
-      - name: Verify current 203-file source and 137-module test closure
+      - name: Verify current 203-file source and 139-module test closure
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
