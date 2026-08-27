@@ -14,8 +14,12 @@ source_tree_sha256 = 50ad30da8670eb488848e6db084084185fea7725e86c7fea480639caa19
 source_identity_changed_by_public_metadata = false
 ```
 
-The final public checkout contains 136 test modules and collected 1408 JUnit
-testcases. Its full live observation was:
+The checked-in public reference observation at commit
+`f6ad6a73ea9e2c46eeadded3f4446775097fdc48` used 136 test modules and
+collected 1408 JUnit testcases. The current checkout closure contains 137 test
+modules after adding the generic CI sanitizer security regression module; this
+does not reinterpret the byte-bound reference observation. That observation
+was:
 
 ```text
 pytest = 78 failed, 1328 passed, 4 skipped, 267 subtests passed

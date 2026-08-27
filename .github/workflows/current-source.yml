@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   scoped-current-source:
-    name: Scoped source identity and targeted regression
+    name: Scoped source identity and targeted regression (GitHub CPython 3.11.9)
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -21,9 +21,17 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11.15"
+          python-version: "3.11.9"
           cache: pip
           cache-dependency-path: requirements/base.lock
+
+      - name: Declare GitHub-hosted CPython compatibility boundary
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = (python -c "import platform; print(platform.python_version())").Trim()
+          if ($version -ne '3.11.9') { throw "expected GitHub-hosted CPython 3.11.9, got $version" }
+          Write-Warning 'This is a GitHub-hosted CPython 3.11.9 compatibility run. It does not replace the local Anaconda CPython 3.11.15 validation identity, and the artifact-hashed environment lock remains false.'
 
       - name: Verify requirement-file checksums
         shell: pwsh
@@ -35,7 +43,7 @@ jobs:
             if ($actual -ne $Matches[1]) { throw "lock checksum mismatch: $($Matches[2])" }
           }
 
-      - name: Install exact base version closure
+      - name: Install exact base package closure
         shell: pwsh
         run: |
           python -m pip install --no-deps -r requirements/base.lock
@@ -70,10 +78,15 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'full-suite test-source closure drifted' }
 
       - name: Run scoped V9R2R1 regression
+        id: targeted_run
         shell: pwsh
         run: |
-          python -m pytest -q -p no:cacheprovider --tb=short `
-            --junitxml="$env:RUNNER_TEMP\targeted.junit.xml" `
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $rawJunit = Join-Path $env:RUNNER_TEMP 'targeted.raw.junit.xml'
+          $rawLog = Join-Path $env:RUNNER_TEMP 'targeted.raw.log'
+          python -m pytest -q -p no:cacheprovider --tb=short --color=no `
+            --junitxml=$rawJunit `
             tests/test_pareto_v21e3r1_v9_information_search.py `
             tests/test_pareto_v21e3r1_v9_strict_regressions.py `
             tests/test_pareto_v21e3r1_v9r1_theory_strict.py `
@@ -88,9 +101,64 @@ jobs:
             tests/test_pareto_v21e3r1_v9_packaging.py `
             tests/test_build_v9r2r1_engineering_source_bundle.py `
             tests/test_check_v9r2r1_full_suite_environment.py `
+            tests/test_sanitize_public_ci_artifacts.py `
             tests/test_pareto_v21e3r1_development_diagnostic_runner.py `
-            tests/test_v21e3r1_same_implementation_branch_replay_coverage.py
-          if ($LASTEXITCODE -ne 0) { throw 'scoped regression failed' }
+            tests/test_v21e3r1_same_implementation_branch_replay_coverage.py *> $rawLog
+          $pytestExit = $LASTEXITCODE
+          "TARGETED_PYTEST_EXIT=$pytestExit" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          if ($pytestExit -ne 0) { Write-Warning "scoped regression returned $pytestExit; raw output remains local to RUNNER_TEMP pending sanitization" }
+          $global:LASTEXITCODE = 0
+
+      - name: Sanitize and verify targeted regression evidence
+        id: targeted_sanitize
+        if: ${{ always() && steps.targeted_run.outcome == 'success' }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $rawJunit = Join-Path $env:RUNNER_TEMP 'targeted.raw.junit.xml'
+          $rawLog = Join-Path $env:RUNNER_TEMP 'targeted.raw.log'
+          $safeJunit = Join-Path $env:RUNNER_TEMP 'targeted.sanitized.junit.xml'
+          $safeLog = Join-Path $env:RUNNER_TEMP 'targeted.sanitized.log'
+          $receipt = Join-Path $env:RUNNER_TEMP 'targeted.sanitization.json'
+          $referenceCommit = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve targeted checkout commit' }
+          $referenceTree = (git rev-parse 'HEAD^{tree}').Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve targeted checkout tree' }
+          $pythonPrefix = (python -c "import sys; print(sys.prefix)").Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve targeted Python prefix' }
+          python scripts/sanitize_public_ci_artifacts.py create `
+            --input "targeted.junit.xml=$rawJunit" `
+            --input "targeted.log=$rawLog" `
+            --output "targeted.junit.xml=$safeJunit" `
+            --output "targeted.log=$safeLog" `
+            --kind "targeted.junit.xml=PYTEST_JUNIT_XML" `
+            --kind "targeted.log=PYTEST_LOG" `
+            --receipt $receipt `
+            --repository-root $env:GITHUB_WORKSPACE `
+            --temp-root $env:RUNNER_TEMP `
+            --user-home $env:USERPROFILE `
+            --environment-prefix $pythonPrefix `
+            --host-name $env:COMPUTERNAME `
+            --reference-commit $referenceCommit `
+            --reference-tree $referenceTree
+          if ($LASTEXITCODE -ne 0) { throw 'targeted evidence sanitization failed' }
+          python scripts/sanitize_public_ci_artifacts.py verify `
+            --output "targeted.junit.xml=$safeJunit" `
+            --output "targeted.log=$safeLog" `
+            --kind "targeted.junit.xml=PYTEST_JUNIT_XML" `
+            --kind "targeted.log=PYTEST_LOG" `
+            --receipt $receipt `
+            --repository-root $env:GITHUB_WORKSPACE `
+            --user-home $env:USERPROFILE `
+            --host-name $env:COMPUTERNAME
+          if ($LASTEXITCODE -ne 0) { throw 'targeted sanitized evidence verification failed' }
+
+      - name: Enforce scoped regression result
+        if: ${{ always() && steps.targeted_run.outcome == 'success' && steps.targeted_sanitize.outcome == 'success' }}
+        shell: pwsh
+        run: |
+          if ([int]$env:TARGETED_PYTEST_EXIT -ne 0) { throw "scoped regression failed with exit $env:TARGETED_PYTEST_EXIT" }
+          Write-Host 'PASS scoped regression; only sanitized JUnit/log evidence is eligible for upload.'
 
       - name: Compile declared source closure
         shell: pwsh
@@ -98,16 +166,19 @@ jobs:
           python -m compileall -q mo_nco scripts/build_v9r2r1_engineering_source_bundle.py scripts/check_v9r2r1_full_suite_environment.py ijoc_submission_v21e3r1/scripts/run_v21e3r1_development_diagnostics.py ijoc_submission_v21e3r1/scripts/run_v21e3r1_same_implementation_branch_replay_coverage.py
           if ($LASTEXITCODE -ne 0) { throw 'compileall failed' }
 
-      - name: Upload targeted JUnit
-        if: always()
+      - name: Upload sanitized targeted evidence
+        if: ${{ always() && steps.targeted_sanitize.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
-          name: v9r2r1-targeted-junit
-          path: ${{ runner.temp }}/targeted.junit.xml
+          name: v9r2r1-targeted-sanitized-evidence
+          path: |
+            ${{ runner.temp }}/targeted.sanitized.junit.xml
+            ${{ runner.temp }}/targeted.sanitized.log
+            ${{ runner.temp }}/targeted.sanitization.json
           if-no-files-found: error
 
   recovered-optional-backend:
-    name: Version-pinned pymoo/moocore recovery seam
+    name: Version-pinned pymoo/moocore public backend seam
     runs-on: windows-latest
     timeout-minutes: 15
     steps:
@@ -142,33 +213,115 @@ jobs:
       - name: Run fail-closed backend preflight
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
           $python = (Get-Command python).Source
           $receipt = Join-Path $env:RUNNER_TEMP 'full_suite_environment_preflight.json'
+          $rawLog = Join-Path $env:RUNNER_TEMP 'full_suite_environment_preflight.raw.log'
           python scripts/check_v9r2r1_full_suite_environment.py `
             --expected-python-executable $python `
             --expected-python-version-prefix 3.13.12 `
             --expected-pymoo-version 0.6.1.6 `
             --expected-moocore-version 0.3.1 `
-            --output $receipt
-          if ($LASTEXITCODE -ne 0) { throw 'HOLD_FULL_SUITE_ENVIRONMENT' }
+            --output $receipt *> $rawLog
+          $preflightExit = $LASTEXITCODE
+          if ($preflightExit -ne 0) { throw 'HOLD_FULL_SUITE_ENVIRONMENT; raw details remain local to RUNNER_TEMP' }
           Write-Warning 'Version closure passed; complete artifact-hashed environment lock remains false.'
 
-      - name: Execute pymoo recovery seam
+      - name: Verify rights-held MOTSP adapter boundary
         shell: pwsh
         run: |
-          python -m pytest -q -p no:cacheprovider --tb=short `
-            --junitxml="$env:RUNNER_TEMP\pymoo-recovery.junit.xml" `
-            tests/test_external_pymoo_baseline.py `
-            tests/test_ijoc_algorithm_adapters.py `
-            -k pymoo
-          if ($LASTEXITCODE -ne 0) { throw 'pymoo recovery regression failed' }
+          $ErrorActionPreference = 'Stop'
+          $disposition = Get-Content -Raw -LiteralPath provenance/V9R2R1_PUBLIC_CHECKOUT_DEPENDENCY_DISPOSITION.json | ConvertFrom-Json
+          $entry = @($disposition.rights_ambiguous_direct_dependencies | Where-Object { $_.path -eq 'benchmarks/public_tsplib/bayg29.tsp' })
+          if ($entry.Count -ne 1) { throw 'expected exactly one bayg29 public-checkout disposition record' }
+          if ($entry[0].disposition -ne 'HOLD_NOT_INCLUDED') { throw 'bayg29 disposition must remain HOLD_NOT_INCLUDED' }
+          if ($entry[0].reason -ne 'REDISTRIBUTION_OR_MANUSCRIPT_PUBLICATION_RIGHTS_NOT_ESTABLISHED') { throw 'bayg29 rights-hold reason drifted' }
+          if (Test-Path -LiteralPath 'benchmarks/public_tsplib/bayg29.tsp') { throw 'rights-held bayg29 fixture must not be present in the public checkout' }
+          Write-Warning 'The bayg29-dependent MOTSP adapter integration remains an expected public-checkout failure and is verified by the separate 78-outcome repository evidence contract.'
 
-      - name: Upload backend preflight and JUnit
-        if: always()
+      - name: Execute public synthetic pymoo backend seam
+        id: backend_run
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $rawJunit = Join-Path $env:RUNNER_TEMP 'pymoo-recovery.raw.junit.xml'
+          $rawLog = Join-Path $env:RUNNER_TEMP 'pymoo-recovery.raw.log'
+          python -m pytest -q -p no:cacheprovider --tb=short --color=no `
+            --junitxml=$rawJunit `
+            tests/test_external_pymoo_baseline.py *> $rawLog
+          $pytestExit = $LASTEXITCODE
+          "BACKEND_PYTEST_EXIT=$pytestExit" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          if ($pytestExit -ne 0) { Write-Warning "public synthetic pymoo backend returned $pytestExit; raw output remains local to RUNNER_TEMP pending sanitization" }
+          $global:LASTEXITCODE = 0
+
+      - name: Sanitize and verify backend evidence
+        id: backend_sanitize
+        if: ${{ always() && steps.backend_run.outcome == 'success' }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $rawPreflight = Join-Path $env:RUNNER_TEMP 'full_suite_environment_preflight.json'
+          $rawJunit = Join-Path $env:RUNNER_TEMP 'pymoo-recovery.raw.junit.xml'
+          $rawLog = Join-Path $env:RUNNER_TEMP 'pymoo-recovery.raw.log'
+          $safePreflight = Join-Path $env:RUNNER_TEMP 'full_suite_environment_preflight.sanitized.json'
+          $safeJunit = Join-Path $env:RUNNER_TEMP 'pymoo-recovery.sanitized.junit.xml'
+          $safeLog = Join-Path $env:RUNNER_TEMP 'pymoo-recovery.sanitized.log'
+          $receipt = Join-Path $env:RUNNER_TEMP 'pymoo-recovery.sanitization.json'
+          $referenceCommit = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve backend checkout commit' }
+          $referenceTree = (git rev-parse 'HEAD^{tree}').Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve backend checkout tree' }
+          $pythonPrefix = (python -c "import sys; print(sys.prefix)").Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve backend Python prefix' }
+          python scripts/sanitize_public_ci_artifacts.py create `
+            --input "backend.environment-preflight.json=$rawPreflight" `
+            --input "backend.junit.xml=$rawJunit" `
+            --input "backend.log=$rawLog" `
+            --output "backend.environment-preflight.json=$safePreflight" `
+            --output "backend.junit.xml=$safeJunit" `
+            --output "backend.log=$safeLog" `
+            --kind "backend.environment-preflight.json=STRICT_JSON" `
+            --kind "backend.junit.xml=PYTEST_JUNIT_XML" `
+            --kind "backend.log=PYTEST_LOG" `
+            --receipt $receipt `
+            --repository-root $env:GITHUB_WORKSPACE `
+            --temp-root $env:RUNNER_TEMP `
+            --user-home $env:USERPROFILE `
+            --environment-prefix $pythonPrefix `
+            --host-name $env:COMPUTERNAME `
+            --reference-commit $referenceCommit `
+            --reference-tree $referenceTree
+          if ($LASTEXITCODE -ne 0) { throw 'backend evidence sanitization failed' }
+          python scripts/sanitize_public_ci_artifacts.py verify `
+            --output "backend.environment-preflight.json=$safePreflight" `
+            --output "backend.junit.xml=$safeJunit" `
+            --output "backend.log=$safeLog" `
+            --kind "backend.environment-preflight.json=STRICT_JSON" `
+            --kind "backend.junit.xml=PYTEST_JUNIT_XML" `
+            --kind "backend.log=PYTEST_LOG" `
+            --receipt $receipt `
+            --repository-root $env:GITHUB_WORKSPACE `
+            --user-home $env:USERPROFILE `
+            --host-name $env:COMPUTERNAME
+          if ($LASTEXITCODE -ne 0) { throw 'backend sanitized evidence verification failed' }
+
+      - name: Enforce public synthetic backend result
+        if: ${{ always() && steps.backend_run.outcome == 'success' && steps.backend_sanitize.outcome == 'success' }}
+        shell: pwsh
+        run: |
+          if ([int]$env:BACKEND_PYTEST_EXIT -ne 0) { throw "public synthetic pymoo backend regression failed with exit $env:BACKEND_PYTEST_EXIT" }
+          Write-Warning 'Backend PASS is scoped to generated synthetic inputs; it does not claim the rights-held bayg29 adapter integration passed.'
+
+      - name: Upload sanitized backend evidence
+        if: ${{ always() && steps.backend_sanitize.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
-          name: v9r2r1-backend-recovery
+          name: v9r2r1-public-backend-sanitized-evidence
           path: |
-            ${{ runner.temp }}/full_suite_environment_preflight.json
-            ${{ runner.temp }}/pymoo-recovery.junit.xml
+            ${{ runner.temp }}/full_suite_environment_preflight.sanitized.json
+            ${{ runner.temp }}/pymoo-recovery.sanitized.junit.xml
+            ${{ runner.temp }}/pymoo-recovery.sanitized.log
+            ${{ runner.temp }}/pymoo-recovery.sanitization.json
           if-no-files-found: error

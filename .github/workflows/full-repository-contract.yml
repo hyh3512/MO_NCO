@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: "3.13.12"
 
-      - name: Verify current 203-file source and 136-module test closure
+      - name: Verify current 203-file source and 137-module test closure
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -155,16 +155,61 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
           $python = (Get-Command python).Source
           $receipt = Join-Path $env:RUNNER_TEMP 'public_checkout_live_environment_preflight.json'
+          $rawLog = Join-Path $env:RUNNER_TEMP 'public_checkout_live_environment_preflight.raw.log'
           python scripts/check_v9r2r1_full_suite_environment.py `
             --expected-python-executable $python `
             --expected-python-version-prefix 3.13.12 `
             --expected-pymoo-version 0.6.1.6 `
             --expected-moocore-version 0.3.1 `
-            --output $receipt
-          if ($LASTEXITCODE -ne 0) { throw 'HOLD_PUBLIC_CHECKOUT_LIVE_ENVIRONMENT' }
+            --output $receipt *> $rawLog
+          $preflightExit = $LASTEXITCODE
+          if ($preflightExit -ne 0) { throw 'HOLD_PUBLIC_CHECKOUT_LIVE_ENVIRONMENT; raw details remain local to RUNNER_TEMP' }
           Write-Warning 'This CI environment is version-pinned but is not the artifact-hashed Anaconda recovery environment.'
+
+      - name: Sanitize and verify live environment preflight
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $rawPreflight = Join-Path $env:RUNNER_TEMP 'public_checkout_live_environment_preflight.json'
+          $rawLog = Join-Path $env:RUNNER_TEMP 'public_checkout_live_environment_preflight.raw.log'
+          $safePreflight = Join-Path $env:RUNNER_TEMP 'public_checkout_live_environment_preflight.sanitized.json'
+          $safeLog = Join-Path $env:RUNNER_TEMP 'public_checkout_live_environment_preflight.sanitized.log'
+          $receipt = Join-Path $env:RUNNER_TEMP 'public_checkout_live_environment_preflight.sanitization.json'
+          $referenceCommit = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve live preflight checkout commit' }
+          $referenceTree = (git rev-parse 'HEAD^{tree}').Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve live preflight checkout tree' }
+          $pythonPrefix = (python -c "import sys; print(sys.prefix)").Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve live preflight Python prefix' }
+          python scripts/sanitize_public_ci_artifacts.py create `
+            --input "environment-preflight.json=$rawPreflight" `
+            --input "environment-preflight.log=$rawLog" `
+            --output "environment-preflight.json=$safePreflight" `
+            --output "environment-preflight.log=$safeLog" `
+            --kind "environment-preflight.json=STRICT_JSON" `
+            --kind "environment-preflight.log=UTF8_TEXT" `
+            --receipt $receipt `
+            --repository-root $env:GITHUB_WORKSPACE `
+            --temp-root $env:RUNNER_TEMP `
+            --user-home $env:USERPROFILE `
+            --environment-prefix $pythonPrefix `
+            --host-name $env:COMPUTERNAME `
+            --reference-commit $referenceCommit `
+            --reference-tree $referenceTree
+          if ($LASTEXITCODE -ne 0) { throw 'live environment preflight sanitization failed' }
+          python scripts/sanitize_public_ci_artifacts.py verify `
+            --output "environment-preflight.json=$safePreflight" `
+            --output "environment-preflight.log=$safeLog" `
+            --kind "environment-preflight.json=STRICT_JSON" `
+            --kind "environment-preflight.log=UTF8_TEXT" `
+            --receipt $receipt `
+            --repository-root $env:GITHUB_WORKSPACE `
+            --user-home $env:USERPROFILE `
+            --host-name $env:COMPUTERNAME
+          if ($LASTEXITCODE -ne 0) { throw 'live sanitized environment preflight verification failed' }
 
       - name: Run and verify exact public-checkout failure contract
         shell: pwsh
@@ -237,7 +282,9 @@ jobs:
         with:
           name: v9r2r1-public-checkout-live-contract
           path: |
-            ${{ runner.temp }}/public_checkout_live_environment_preflight.json
+            ${{ runner.temp }}/public_checkout_live_environment_preflight.sanitized.json
+            ${{ runner.temp }}/public_checkout_live_environment_preflight.sanitized.log
+            ${{ runner.temp }}/public_checkout_live_environment_preflight.sanitization.json
             ${{ runner.temp }}/full_repository.sanitized.junit.xml
             ${{ runner.temp }}/full_repository.sanitized.log
             ${{ runner.temp }}/V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json
