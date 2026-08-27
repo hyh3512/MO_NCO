@@ -24,8 +24,8 @@ from typing import Mapping, Sequence
 import xml.etree.ElementTree as ET
 
 
-REGISTRY_SCHEMA = "v21e3r1_v9r2r1_expected_public_checkout_failure_set_v1"
-RECEIPT_SCHEMA = "v21e3r1_v9r2r1_public_checkout_failure_set_verification_v1"
+REGISTRY_SCHEMA = "v21e3r1_v9r2r1_expected_public_checkout_failure_set_v2"
+RECEIPT_SCHEMA = "v21e3r1_v9r2r1_public_checkout_failure_set_verification_v2"
 PASS_STATUS = "PASS_EXACT_EXPECTED_PUBLIC_CHECKOUT_NON_GREEN_FAILURE_SET"
 REFERENCE_COMMIT = "f6ad6a73ea9e2c46eeadded3f4446775097fdc48"
 REFERENCE_TREE = "368bf76b61938521d073130a50ebe8cb876af41a"
@@ -76,6 +76,23 @@ FROZEN_V8_NODE_IDS = frozenset(
         "test_real_incident_preflight_is_read_only_and_requires_fresh_exact17",
     }
 )
+PORTABLE_INTERPRETER_NODE_ID = (
+    "tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::"
+    "test_real_incident_preflight_is_read_only_and_requires_fresh_exact17"
+)
+FROZEN_MANIFEST_MARKER = "Frozen diagnostic source manifest drifted"
+HISTORICAL_INTERPRETER_MARKER = (
+    "Helper must use the exact historical main-job interpreter"
+)
+EXPECTED_FROZEN_V8_FAILURE_MARKER_CONTRACT = {
+    "default_allowed_markers": [FROZEN_MANIFEST_MARKER],
+    "node_overrides": {
+        PORTABLE_INTERPRETER_NODE_ID: [
+            FROZEN_MANIFEST_MARKER,
+            HISTORICAL_INTERPRETER_MARKER,
+        ]
+    },
+}
 SEALED_NODE_IDS = frozenset(
     {
         "tests/test_v21e3r1_successor_metric.py::"
@@ -194,6 +211,7 @@ def _validate_registry(payload: Mapping[str, object]) -> dict[str, object]:
         "authorization_boundaries",
         "classification_counts",
         "expected_counts",
+        "frozen_v8_failure_marker_contract",
         "expected_junit_failure_signatures",
         "expected_junit_failure_or_error_node_ids",
         "expected_pytest_outcomes",
@@ -274,6 +292,13 @@ def _validate_registry(payload: Mapping[str, object]) -> dict[str, object]:
     }
     if payload.get("classification_counts") != expected_classification:
         raise PublicCheckoutFailureSetError("classification count contract drifted")
+    if (
+        payload.get("frozen_v8_failure_marker_contract")
+        != EXPECTED_FROZEN_V8_FAILURE_MARKER_CONTRACT
+    ):
+        raise PublicCheckoutFailureSetError(
+            "frozen-V8 failure marker contract drifted"
+        )
 
     evidence = payload.get("reference_evidence")
     if type(evidence) is not dict or set(evidence) != {"junit", "log"}:
@@ -433,7 +458,19 @@ def _pytest_node_id(testcase: ET.Element) -> str:
     return module + "::" + "::".join(suffix)
 
 
-def _junit_observation(raw: bytes) -> dict[str, object]:
+def _matches_exact_marker_prefix(message: str, allowed_markers: Sequence[str]) -> bool:
+    matches = [
+        marker
+        for marker in allowed_markers
+        if message == marker or message.startswith(marker + " ")
+    ]
+    return len(matches) == 1
+
+
+def _junit_observation(
+    raw: bytes,
+    frozen_marker_contract: Mapping[str, object],
+) -> dict[str, object]:
     upper = raw.upper()
     if b"<!DOCTYPE" in upper or b"<!ENTITY" in upper:
         raise PublicCheckoutFailureSetError("DTD/entity declarations are prohibited")
@@ -476,6 +513,24 @@ def _junit_observation(raw: bytes) -> dict[str, object]:
             failure_children += len(failures)
             error_children += len(errors)
             terminal_children = [*failures, *errors]
+            category = _expected_category(node_id)
+            if category == FROZEN_V8_CATEGORY:
+                overrides = frozen_marker_contract["node_overrides"]
+                allowed_markers = overrides.get(
+                    node_id,
+                    frozen_marker_contract["default_allowed_markers"],
+                )
+                messages = [
+                    child.attrib.get("message", "").partition(":")[2].strip()
+                    for child in terminal_children
+                ]
+                if any(
+                    not _matches_exact_marker_prefix(message, allowed_markers)
+                    for message in messages
+                ):
+                    raise PublicCheckoutFailureSetError(
+                        f"frozen-V8 failure marker drifted: {node_id!r}"
+                    )
             texts = [
                 "\n".join(
                     part
@@ -484,14 +539,6 @@ def _junit_observation(raw: bytes) -> dict[str, object]:
                 )
                 for child in terminal_children
             ]
-            category = _expected_category(node_id)
-            if category == FROZEN_V8_CATEGORY and any(
-                "Frozen diagnostic source manifest drifted" not in text
-                for text in texts
-            ):
-                raise PublicCheckoutFailureSetError(
-                    f"frozen-V8 failure marker drifted: {node_id!r}"
-                )
             if category == SEALED_CATEGORY and any(
                 "trace.sqlite3" not in text for text in texts
             ):
@@ -639,7 +686,10 @@ def verify_expected_failure_set(
                     f"reference {name} bytes/hash drifted"
                 )
 
-    junit = _junit_observation(junit_raw)
+    junit = _junit_observation(
+        junit_raw,
+        registry["frozen_v8_failure_marker_contract"],
+    )
     log = _log_observation(log_raw)
     expected_counts = registry["expected_counts"]
     observed_junit_counts = junit["counts"]

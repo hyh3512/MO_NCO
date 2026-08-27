@@ -358,9 +358,18 @@ def test_xml_character_reference_encoded_windows_path_is_rejected(
         )
 
 
-def test_strict_json_decoded_windows_path_is_rejected(tmp_path: Path) -> None:
-    encoded_path = b'{"path":"C\\u003a\\\\Private\\\\result.txt"}'
-
+@pytest.mark.parametrize(
+    "encoded_path",
+    [
+        b'{"path":"C\\u003a\\\\Private\\\\result.txt"}',
+        b'{"path":"C\\u003a\\u005cPrivate\\u005cresult.txt"}',
+    ],
+    ids=("unicode-colon-json-slashes", "fully-unicode-escaped-path"),
+)
+def test_strict_json_decoded_windows_path_is_rejected(
+    tmp_path: Path,
+    encoded_path: bytes,
+) -> None:
     with pytest.raises(ValueError, match="JSON|Windows|absolute path"):
         _create_bundle(
             tmp_path,
@@ -424,6 +433,20 @@ def test_live_preflight_stdout_is_declared_as_strict_json() -> None:
         '--kind "environment-preflight.log=STRICT_JSON"'
     ) == 2
     assert 'environment-preflight.log=UTF8_TEXT' not in workflow
+
+
+def test_live_failure_evidence_is_sanitized_even_after_contract_failure() -> None:
+    workflow = (
+        ROOT / ".github/workflows/full-repository-contract.yml"
+    ).read_text(encoding="utf-8")
+    step = workflow.split(
+        "      - name: Sanitize and reverify live public-checkout evidence\n",
+        maxsplit=1,
+    )[1].split("\n      - name:", maxsplit=1)[0]
+
+    assert "        if: always()\n" in step
+    assert "scripts/sanitize_public_checkout_outputs.py create" in step
+    assert "scripts/sanitize_public_checkout_outputs.py verify" in step
 
 
 def test_junit_host_replacement_is_limited_to_testsuite_hostname(

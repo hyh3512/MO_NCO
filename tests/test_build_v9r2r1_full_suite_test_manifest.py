@@ -21,7 +21,7 @@ def test_recorded_full_suite_test_sources_are_hash_closed() -> None:
     assert completed.returncode == 0, completed.stdout + completed.stderr
     payload = json.loads(completed.stdout)
     assert payload["status"] == "PASS_FULL_SUITE_TEST_SOURCE_CLOSURE"
-    assert payload["test_module_count"] == 137
+    assert payload["test_module_count"] == 139
     assert payload["repository_wide_green"] is False
     assert payload["scientific_stage_authorized"] is False
 

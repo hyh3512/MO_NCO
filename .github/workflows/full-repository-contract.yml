@@ -234,6 +234,7 @@ jobs:
           Write-Warning 'Repository-wide green remains FALSE; expected failures were executed and were not xfailed, skipped, or converted to success.'
 
       - name: Sanitize and reverify live public-checkout evidence
+        if: always()
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'

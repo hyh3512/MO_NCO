@@ -16,10 +16,10 @@ source_identity_changed_by_public_metadata = false
 
 The checked-in public reference observation at commit
 `f6ad6a73ea9e2c46eeadded3f4446775097fdc48` used 136 test modules and
-collected 1408 JUnit testcases. The current checkout closure contains 137 test
-modules after adding the generic CI sanitizer security regression module; this
-does not reinterpret the byte-bound reference observation. That observation
-was:
+collected 1408 JUnit testcases. The current checkout closure contains 139 test
+modules after adding the generic CI sanitizer, portable fail-closed marker,
+and GitHub CI-envelope verifier regression modules; this does not reinterpret
+the byte-bound reference observation. That observation was:
 
 ```text
 pytest = 78 failed, 1328 passed, 4 skipped, 267 subtests passed
@@ -60,6 +60,17 @@ independent implementation, or real external custody.
 - wheels, source archives, virtual environments, caches, build trees, or large
   trace/result warehouses;
 - third-party data or solver binaries lacking verified redistribution rights.
+
+## GitHub CI evidence boundary
+
+The CI envelope is verified against the exact subject commit's Git objects and
+the downloaded bytes of every declared workflow artifact. Its creation also
+requires a live GitHub API cross-check of repository, run, job, and artifact
+metadata. GitHub currently supplies no repository-owned signature over that
+metadata in this workflow, so the checked-in envelope remains an unsigned,
+offline-auditable evidence index rather than a cryptographic GitHub
+attestation. That limitation is represented as `false`, not silently promoted
+to an authenticated provenance claim.
 
 ## Independent-reproduction boundary
 
