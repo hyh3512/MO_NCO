@@ -1,0 +1,1149 @@
+F...........................F....FF......s...F.......................... [  5%]
+................F..F.F.F...................................ss.... [  9%]
+.......................s......................................... [ 14%]
+.............................FF................FF.......F. [ 18%]
+.....F........FF.F...................FF...........................F..F.F [ 23%]
+FF................................................................................................... [ 30%]
+................................. [ 33%]
+......................................................... [ 37%]
+...FFFF....F............................................................ [ 42%]
+........................................................................ [ 47%]
+........................................................................ [ 52%]
+........................................................................ [ 57%]
+.....FF..............FF................................................. [ 62%]
+........................................................................ [ 67%]
+........................................................................ [ 72%]
+........................................................................ [ 78%]
+.........F.F.FFFFFF..........F.......................................... [ 83%]
+................................FF..FF..........................F....... [ 88%]
+.......................F.....................FFFFFFFFFFF................ [ 93%]
+.......FFFFFFF...............................................FF......... [ 98%]
+..FFFFFFF............                                                    [100%]
+================================== FAILURES ===================================
+_ AlgorithmConfigurationPreflightTests.test_complete_manifest_is_built_without_objective_evaluation _
+tests\test_algorithm_configuration_preflight.py:74: in test_complete_manifest_is_built_without_objective_evaluation
+    manifest = build_algorithm_configuration_manifest(
+mo_nco\benchmark_suite.py:412: in build_algorithm_configuration_manifest
+    resolve_predeclared_algorithm_configuration(
+mo_nco\benchmark.py:496: in resolve_predeclared_algorithm_configuration
+    certificate_binding = _pure_certificate_binding(
+mo_nco\benchmark.py:244: in _pure_certificate_binding
+    resolved = resolve_fixed_reference_certificate_specification(
+mo_nco\pareto_fixed_reference_spec.py:169: in resolve_fixed_reference_certificate_specification
+    raise ValueError(
+E   ValueError: Fixed-reference manifest is missing: __REPO_ROOT__\benchmarks\pareto_smc_v11_fixed_reference_smoke_manifest.json
+_____ BenchmarkTests.test_frozen_v11_suite_binds_integer_matrix_artifacts _____
+tests\test_benchmark.py:239: in test_frozen_v11_suite_binds_integer_matrix_artifacts
+    suite = BenchmarkSuite.from_json(
+mo_nco\benchmark_suite.py:96: in from_json
+    payload = json.loads(path.read_text(encoding="utf-8"))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'benchmarks\\pareto_smc_v11_competitive_suite.json'
+______ BenchmarkTests.test_pilot_confirm_v11_alias_charges_both_streams _______
+tests\test_benchmark.py:63: in test_pilot_confirm_v11_alias_charges_both_streams
+    result = run_algorithm(
+mo_nco\benchmark.py:835: in run_algorithm
+    resolve_fixed_reference_certificate_specification(
+mo_nco\pareto_fixed_reference_spec.py:169: in resolve_fixed_reference_certificate_specification
+    raise ValueError(
+E   ValueError: Fixed-reference manifest is missing: __REPO_ROOT__\benchmarks\pareto_smc_v11_fixed_reference_smoke_manifest.json
+__ BenchmarkTests.test_pilot_confirm_v12_alias_binds_regeneration_commitment __
+tests\test_benchmark.py:128: in test_pilot_confirm_v12_alias_binds_regeneration_commitment
+    result = run_algorithm(
+mo_nco\benchmark.py:835: in run_algorithm
+    resolve_fixed_reference_certificate_specification(
+mo_nco\pareto_fixed_reference_spec.py:169: in resolve_fixed_reference_certificate_specification
+    raise ValueError(
+E   ValueError: Fixed-reference manifest is missing: __REPO_ROOT__\benchmarks\pareto_smc_v11_fixed_reference_smoke_manifest.json
+__ BenchmarkTests.test_v12_benchmark_record_carries_publication_packet_gate ___
+tests\test_benchmark.py:212: in test_v12_benchmark_record_carries_publication_packet_gate
+    records, _ = run_benchmark(
+mo_nco\benchmark.py:2333: in run_benchmark
+    (algorithm, seed): resolve_predeclared_algorithm_configuration(
+mo_nco\benchmark.py:496: in resolve_predeclared_algorithm_configuration
+    certificate_binding = _pure_certificate_binding(
+mo_nco\benchmark.py:244: in _pure_certificate_binding
+    resolved = resolve_fixed_reference_certificate_specification(
+mo_nco\pareto_fixed_reference_spec.py:169: in resolve_fixed_reference_certificate_specification
+    raise ValueError(
+E   ValueError: Fixed-reference manifest is missing: __REPO_ROOT__\benchmarks\pareto_smc_v11_fixed_reference_smoke_manifest.json
+_ IJOCAlgorithmAdapterTests.test_frozen_motsp_packets_are_in_the_exact_integer_domain _
+tests\test_ijoc_algorithm_adapters.py:431: in test_frozen_motsp_packets_are_in_the_exact_integer_domain
+    self.assertEqual(cases, 15)
+E   AssertionError: 0 != 15
+___ IJOCAlgorithmAdapterTests.test_motsp_pls_adapter_and_independent_replay ___
+tests\test_ijoc_algorithm_adapters.py:352: in test_motsp_pls_adapter_and_independent_replay
+    self.run_motsp_and_replay("motsp-pls-native-v1")
+tests\test_ijoc_algorithm_adapters.py:303: in run_motsp_and_replay
+    input_path = self.build_motsp_input(root, algorithm=algorithm)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_ijoc_algorithm_adapters.py:180: in build_motsp_input
+    shutil.copyfile(source, target)
+__PYTHON_PREFIX__\Lib\shutil.py:260: in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\benchmarks\\public_tsplib\\bayg29.tsp'
+_ IJOCAlgorithmAdapterTests.test_motsp_pls_restart_v2_adapter_and_independent_replay _
+tests\test_ijoc_algorithm_adapters.py:355: in test_motsp_pls_restart_v2_adapter_and_independent_replay
+    self.run_motsp_and_replay("motsp-pls-restart-native-v2")
+tests\test_ijoc_algorithm_adapters.py:303: in run_motsp_and_replay
+    input_path = self.build_motsp_input(root, algorithm=algorithm)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_ijoc_algorithm_adapters.py:180: in build_motsp_input
+    shutil.copyfile(source, target)
+__PYTHON_PREFIX__\Lib\shutil.py:260: in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\benchmarks\\public_tsplib\\bayg29.tsp'
+_ IJOCAlgorithmAdapterTests.test_motsp_pymoo_adapters_and_independent_replay (algorithm='pymoo-nsga2') _
+tests\test_ijoc_algorithm_adapters.py:440: in test_motsp_pymoo_adapters_and_independent_replay
+    self.run_motsp_and_replay(algorithm)
+tests\test_ijoc_algorithm_adapters.py:303: in run_motsp_and_replay
+    input_path = self.build_motsp_input(root, algorithm=algorithm)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_ijoc_algorithm_adapters.py:180: in build_motsp_input
+    shutil.copyfile(source, target)
+__PYTHON_PREFIX__\Lib\shutil.py:260: in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\benchmarks\\public_tsplib\\bayg29.tsp'
+_ IJOCAlgorithmAdapterTests.test_motsp_pymoo_adapters_and_independent_replay (algorithm='pymoo-moead') _
+tests\test_ijoc_algorithm_adapters.py:440: in test_motsp_pymoo_adapters_and_independent_replay
+    self.run_motsp_and_replay(algorithm)
+tests\test_ijoc_algorithm_adapters.py:303: in run_motsp_and_replay
+    input_path = self.build_motsp_input(root, algorithm=algorithm)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_ijoc_algorithm_adapters.py:180: in build_motsp_input
+    shutil.copyfile(source, target)
+__PYTHON_PREFIX__\Lib\shutil.py:260: in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\benchmarks\\public_tsplib\\bayg29.tsp'
+_ IJOCAlgorithmAdapterTests.test_motsp_treatment_adapter_and_independent_replay _
+tests\test_ijoc_algorithm_adapters.py:349: in test_motsp_treatment_adapter_and_independent_replay
+    self.run_motsp_and_replay("ijoc-pareto-smc")
+tests\test_ijoc_algorithm_adapters.py:303: in run_motsp_and_replay
+    input_path = self.build_motsp_input(root, algorithm=algorithm)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_ijoc_algorithm_adapters.py:180: in build_motsp_input
+    shutil.copyfile(source, target)
+__PYTHON_PREFIX__\Lib\shutil.py:260: in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\benchmarks\\public_tsplib\\bayg29.tsp'
+_ FixedScheduleReferenceCertificateTests.test_fixed_reference_duplicate_json_fields_fail_closed _
+tests\test_pareto_fixed_schedule_certificate.py:49: in test_fixed_reference_duplicate_json_fields_fail_closed
+    ).read_text(encoding="utf-8")
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\benchmarks\\pareto_smc_v10_fixed_reference_smoke.json'
+_ FixedScheduleReferenceCertificateTests.test_fixed_reference_numeric_strings_and_booleans_fail_closed _
+tests\test_pareto_fixed_schedule_certificate.py:73: in test_fixed_reference_numeric_strings_and_booleans_fail_closed
+    ).read_text(encoding="utf-8")
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\benchmarks\\pareto_smc_v10_fixed_reference_smoke.json'
+_ IJOCExperimentInfrastructureTests.test_postrun_accepts_complete_bound_receipts_and_detects_tamper _
+tests\test_pareto_ijoc_experiment_infrastructure.py:1393: in test_postrun_accepts_complete_bound_receipts_and_detects_tamper
+    ).read_text(encoding="utf-8")
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\protocol\\schemas\\ijoc_post_run_audit_v2.schema.json'
+_ IJOCExperimentInfrastructureTests.test_postrun_cli_exposes_retry_and_resource_verdicts _
+tests\test_pareto_ijoc_experiment_infrastructure.py:1264: in test_postrun_cli_exposes_retry_and_resource_verdicts
+    from scripts import audit_ijoc_postrun
+E   ImportError: cannot import name 'audit_ijoc_postrun' from 'scripts' (unknown location)
+_ IJOCFormalAnalysisTests.test_completed_matrix_is_recomputed_bound_and_gated_end_to_end _
+tests\test_pareto_ijoc_formal_analysis.py:776: in test_completed_matrix_is_recomputed_bound_and_gated_end_to_end
+    ).read_text(encoding="utf-8")
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\protocol\\schemas\\ijoc_formal_metric_statistical_audit_v2.schema.json'
+_ NestedEvidenceVerificationTests.test_cli_emits_machine_readable_pass_summary _
+tests\test_pareto_ijoc_nested_verification.py:427: in test_cli_emits_machine_readable_pass_summary
+    self.assertEqual(completed.returncode, 0, completed.stderr)
+E   AssertionError: 2 != 0 : __PYTHON_PREFIX__\python.exe: can't open file '__REPO_ROOT__\\scripts\\verify_ijoc_nested_manifests.py': [Errno 2] No such file or directory
+___________ test_real_two_family_gate_is_hash_bound_and_idempotent ____________
+mo_nco\pareto_ijoc_reference.py:114: in strict_json
+    source.read_text(encoding="utf-8"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\formal_study\\case_manifest.json'
+
+The above exception was the direct cause of the following exception:
+tests\test_pareto_ijoc_reference_calibration.py:178: in test_real_two_family_gate_is_hash_bound_and_idempotent
+    first = build_reference_suite(**keyword)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+mo_nco\pareto_ijoc_reference.py:1029: in build_reference_suite
+    formal_manifest, all_cases = load_formal_cases(manifest_path)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+mo_nco\pareto_ijoc_reference.py:233: in load_formal_cases
+    manifest = strict_json(path)
+               ^^^^^^^^^^^^^^^^^
+mo_nco\pareto_ijoc_reference.py:119: in strict_json
+    raise ValueError(f"Invalid strict JSON at {source}: {error}") from error
+E   ValueError: Invalid strict JSON at __REPO_ROOT__\ijoc_submission_v20\formal_study\case_manifest.json: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\formal_study\\case_manifest.json'
+________________ test_verifier_rejects_tampered_case_artifact _________________
+mo_nco\pareto_ijoc_reference.py:114: in strict_json
+    source.read_text(encoding="utf-8"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\formal_study\\case_manifest.json'
+
+The above exception was the direct cause of the following exception:
+tests\test_pareto_ijoc_reference_calibration.py:200: in test_verifier_rejects_tampered_case_artifact
+    build_reference_suite(
+mo_nco\pareto_ijoc_reference.py:1029: in build_reference_suite
+    formal_manifest, all_cases = load_formal_cases(manifest_path)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+mo_nco\pareto_ijoc_reference.py:233: in load_formal_cases
+    manifest = strict_json(path)
+               ^^^^^^^^^^^^^^^^^
+mo_nco\pareto_ijoc_reference.py:119: in strict_json
+    raise ValueError(f"Invalid strict JSON at {source}: {error}") from error
+E   ValueError: Invalid strict JSON at __REPO_ROOT__\ijoc_submission_v20\formal_study\case_manifest.json: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\formal_study\\case_manifest.json'
+_____ test_content_addressed_verifier_imports_only_from_frozen_pythonpath _____
+mo_nco\pareto_ijoc_reference.py:114: in strict_json
+    source.read_text(encoding="utf-8"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\formal_study\\instances\\mokp-formal_test-n100-s00.packet.json'
+
+The above exception was the direct cause of the following exception:
+tests\test_pareto_ijoc_reference_calibration.py:299: in test_content_addressed_verifier_imports_only_from_frozen_pythonpath
+    packet_payload = strict_json(packet)
+                     ^^^^^^^^^^^^^^^^^^^
+mo_nco\pareto_ijoc_reference.py:119: in strict_json
+    raise ValueError(f"Invalid strict JSON at {source}: {error}") from error
+E   ValueError: Invalid strict JSON at __REPO_ROOT__\ijoc_submission_v20\formal_study\instances\mokp-formal_test-n100-s00.packet.json: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\formal_study\\instances\\mokp-formal_test-n100-s00.packet.json'
+_________________ test_cli_build_verify_and_audit_round_trip __________________
+tests\test_pareto_ijoc_submission_manifest.py:395: in test_cli_build_verify_and_audit_round_trip
+    build = subprocess.run(
+__PYTHON_PREFIX__\Lib\subprocess.py:577: in run
+    raise CalledProcessError(retcode, process.args,
+E   subprocess.CalledProcessError: Command '['__PYTHON_PREFIX__\\python.exe', '__REPO_ROOT__\\scripts\\manage_ijoc_submission_artifacts.py', 'build', '--packet-root', '__TEMP_ROOT__\\pytest-of-__USERNAME__\\pytest-4844\\test_cli_build_verify_and_audi0\\packet', '--required-file-spec', '__TEMP_ROOT__\\pytest-of-__USERNAME__\\pytest-4844\\test_cli_build_verify_and_audi0\\required.json', '--manifest-output', '__TEMP_ROOT__\\pytest-of-__USERNAME__\\pytest-4844\\test_cli_build_verify_and_audi0\\packet\\manifest.json']' returned non-zero exit status 2.
+_ TailCalibrationFreezeContractTests.test_decision_rule_digest_matches_formal_freezer_canonical_value _
+tests\test_pareto_ijoc_tail_calibration.py:35: in test_decision_rule_digest_matches_formal_freezer_canonical_value
+    ).read_text(encoding="utf-8")
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\calibration\\frozen\\tail_policy_freeze.json'
+_ VersionedReleaseArchiveTests.test_versioned_release_build_emits_bound_outputs_only _
+tests\test_pareto_ijoc_versioned_refreeze.py:71: in test_versioned_release_build_emits_bound_outputs_only
+    canonical_archive_before = _ARCHIVE_BUILDER.ARCHIVE_PATH.read_bytes()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\release\\mo_nco_pareto_smc_v20_ijoc_source.tar.gz'
+_ VersionedFreezeRequestTests.test_paired_analysis_contract_accepts_restart_v2_baseline _
+tests\test_pareto_ijoc_versioned_refreeze.py:431: in test_paired_analysis_contract_accepts_restart_v2_baseline
+    _REQUEST_BUILDER.SUCCESSOR_ANALYSIS_PLAN_PATH.read_text(
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\protocol\\formal_analysis_plan_v20_1_pls_restart.json'
+_ VersionedFreezeRequestTests.test_successor_analysis_plan_has_only_predeclared_differences _
+tests\test_pareto_ijoc_versioned_refreeze.py:392: in test_successor_analysis_plan_has_only_predeclared_differences
+    _REQUEST_BUILDER.ANALYSIS_PLAN_PATH.read_text(encoding="utf-8")
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\protocol\\formal_analysis_plan.json'
+_ VersionedFreezeRequestTests.test_successor_changes_only_the_motsp_pls_baseline_arm _
+tests\test_pareto_ijoc_versioned_refreeze.py:337: in test_successor_changes_only_the_motsp_pls_baseline_arm
+    _REQUEST_BUILDER.build_freeze_request(canonical_options)
+ijoc_submission_v20\scripts\build_formal_freeze_request.py:308: in build_freeze_request
+    raise FileNotFoundError(
+E   FileNotFoundError: Formal freeze inputs are missing: __REPO_ROOT__\ijoc_submission_v20\formal_study\case_manifest.json, __REPO_ROOT__\ijoc_submission_v20\formal_study\instance_packet_manifest.json, __REPO_ROOT__\ijoc_submission_v20\formal_study\metric_references\reference_calibration_precommit.json, __REPO_ROOT__\ijoc_submission_v20\formal_study\metric_references\reference_calibration_completion_receipt.json, __REPO_ROOT__\ijoc_submission_v20\calibration\frozen\calibration_suite_receipt.json, __REPO_ROOT__\ijoc_submission_v20\calibration\frozen\tail_policy_freeze.json, __REPO_ROOT__\ijoc_submission_v20\protocol\formal_analysis_plan.json, __REPO_ROOT__\ijoc_submission_v20\release\mo_nco_pareto_smc_v20_ijoc_source.tar.gz, __REPO_ROOT__\ijoc_submission_v20\release\requirements-formal-lock.txt
+_ VersionedFreezeRequestTests.test_successor_request_binds_identity_and_exact_archive_provenance _
+tests\test_pareto_ijoc_versioned_refreeze.py:225: in test_successor_request_binds_identity_and_exact_archive_provenance
+    canonical_request_before = _REQUEST_BUILDER.REQUEST_PATH.read_bytes()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v20\\freeze_request.json'
+______ test_release_zip_is_deterministic_and_manifest_binds_every_entry _______
+tests\test_pareto_v21_code_release.py:38: in test_release_zip_is_deterministic_and_manifest_binds_every_entry
+    builder = _load_release_builder()
+              ^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pareto_v21_code_release.py:26: in _load_release_builder
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:1019: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1156: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1214: in get_data
+    ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21\\scripts\\build_v21_code_release.py'
+___ test_explicit_allowlist_includes_v3_inputs_and_excludes_large_evidence ____
+tests\test_pareto_v21_code_release.py:96: in test_explicit_allowlist_includes_v3_inputs_and_excludes_large_evidence
+    builder = _load_release_builder()
+              ^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pareto_v21_code_release.py:26: in _load_release_builder
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:1019: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1156: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1214: in get_data
+    ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21\\scripts\\build_v21_code_release.py'
+_______ test_release_boundary_is_fail_closed_and_outputs_are_immutable ________
+tests\test_pareto_v21_code_release.py:150: in test_release_boundary_is_fail_closed_and_outputs_are_immutable
+    builder = _load_release_builder()
+              ^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pareto_v21_code_release.py:26: in _load_release_builder
+    spec.loader.exec_module(module)
+<frozen importlib._bootstrap_external>:1019: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1156: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1214: in get_data
+    ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21\\scripts\\build_v21_code_release.py'
+________ test_release_readme_states_code_only_and_formal_gate_boundary ________
+tests\test_pareto_v21_code_release.py:188: in test_release_readme_states_code_only_and_formal_gate_boundary
+    ).read_text(encoding="utf-8")
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21\\release\\README.md'
+___________ test_confirmation_gate_cli_writes_authoritative_receipt ___________
+tests\test_pareto_v21_confirmation.py:289: in test_confirmation_gate_cli_writes_authoritative_receipt
+    assert process.returncode == 0, process.stderr
+E   AssertionError: __PYTHON_PREFIX__\python.exe: can't open file '__REPO_ROOT__\\ijoc_submission_v21\\scripts\\evaluate_confirmation_gate.py': [Errno 2] No such file or directory
+E     
+E   assert 2 == 0
+E    +  where 2 = CompletedProcess(args=['__PYTHON_PREFIX__\\python.exe', '__REPO_ROOT__\...260826_001\\\\ijoc_submission_v21\\\\scripts\\\\evaluate_confirmation_gate.py': [Errno 2] No such file or directory\n").returncode
+_ test_verified_release_selects_snapshot_dynamic_dependencies_and_inventories_parent _
+tests\test_pareto_v21e3r1_release_dynamic_dependencies.py:168: in test_verified_release_selects_snapshot_dynamic_dependencies_and_inventories_parent
+    ) = _authorized_fixture(tmp_path, included_dynamic_paths=DYNAMIC_PATHS)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pareto_v21e3r1_release_dynamic_dependencies.py:70: in _authorized_fixture
+    parent_raw = PARENT_ARCHIVE.read_bytes()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3\\release\\ijoc_v21e3_experiment_code.zip'
+_ test_verified_release_rejects_parent_substitution_when_snapshot_omits_paths _
+tests\test_pareto_v21e3r1_release_dynamic_dependencies.py:236: in test_verified_release_rejects_parent_substitution_when_snapshot_omits_paths
+    builder, repo, authorization_path, authorization, _, _ = _authorized_fixture(
+tests\test_pareto_v21e3r1_release_dynamic_dependencies.py:70: in _authorized_fixture
+    parent_raw = PARENT_ARCHIVE.read_bytes()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3\\release\\ijoc_v21e3_experiment_code.zip'
+________ test_prospective_snapshot_binds_v21e3_scripts_loaded_by_tests ________
+tests\test_pareto_v21e3r1_snapshot_dynamic_dependencies.py:51: in test_prospective_snapshot_binds_v21e3_scripts_loaded_by_tests
+    snapshot = freeze.compute_prospective_source_root(
+ijoc_submission_v21e3r1\scripts\freeze_v21e3r1_development_snapshot.py:268: in compute_prospective_source_root
+    old_zip, old_digest = _immutable_parent(root, expected_v21e3_zip_sha256)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ijoc_submission_v21e3r1\scripts\freeze_v21e3r1_development_snapshot.py:219: in _immutable_parent
+    old_digest = _sha256(old_zip.read_bytes())
+                         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3\\release\\ijoc_v21e3_experiment_code.zip'
+____ test_independent_preflight_reconstructs_the_same_prospective_path_set ____
+tests\test_pareto_v21e3r1_snapshot_dynamic_dependencies.py:68: in test_independent_preflight_reconstructs_the_same_prospective_path_set
+    prospective = freeze.compute_prospective_source_root(
+ijoc_submission_v21e3r1\scripts\freeze_v21e3r1_development_snapshot.py:268: in compute_prospective_source_root
+    old_zip, old_digest = _immutable_parent(root, expected_v21e3_zip_sha256)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ijoc_submission_v21e3r1\scripts\freeze_v21e3r1_development_snapshot.py:219: in _immutable_parent
+    old_digest = _sha256(old_zip.read_bytes())
+                         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3\\release\\ijoc_v21e3_experiment_code.zip'
+_ test_real_postincident_predecessor_preflight_fails_closed_and_is_read_only __
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery.py:1106: in test_real_postincident_predecessor_preflight_fails_closed_and_is_read_only
+    claim = json.loads(claim_path.read_text(encoding="utf-8"))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\outputs\\v21e3r1_v7_exposed_development_diagnostics_20260823\\metric-timeout-recovery.v21e3-motsp-development-n500-s00.helper-instance.claim.json'
+____ test_real_incident_preflight_is_read_only_and_requires_fresh_exact17 _____
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:90: in test_real_incident_preflight_is_read_only_and_requires_fresh_exact17
+    ) = helper.preflight(
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:1441: in preflight
+    context = _validate_incident(root, output, predecessor, runner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:497: in _validate_incident
+    rows, all_row_ids = _build_rows(project_root, output, predecessor, runner)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:408: in _build_rows
+    _fail("Frozen diagnostic source manifest drifted")
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:199: in _fail
+    raise RuntimeError(message)
+E   RuntimeError: Frozen diagnostic source manifest drifted
+_________ test_external_scheduling_missing_bound_file_is_fail_closed __________
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:173: in test_external_scheduling_missing_bound_file_is_fail_closed
+    _real_external_validation_inputs(helper)
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:164: in _real_external_validation_inputs
+    context = helper._validate_incident(
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:497: in _validate_incident
+    rows, all_row_ids = _build_rows(project_root, output, predecessor, runner)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:408: in _build_rows
+    _fail("Frozen diagnostic source manifest drifted")
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:199: in _fail
+    raise RuntimeError(message)
+E   RuntimeError: Frozen diagnostic source manifest drifted
+_________ test_external_scheduling_raw_receipt_tamper_is_fail_closed __________
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:200: in test_external_scheduling_raw_receipt_tamper_is_fail_closed
+    _real_external_validation_inputs(helper)
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:164: in _real_external_validation_inputs
+    context = helper._validate_incident(
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:497: in _validate_incident
+    rows, all_row_ids = _build_rows(project_root, output, predecessor, runner)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:408: in _build_rows
+    _fail("Frozen diagnostic source manifest drifted")
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:199: in _fail
+    raise RuntimeError(message)
+E   RuntimeError: Frozen diagnostic source manifest drifted
+_ test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed[external-scheduling s01 success receipt-schema-drifted_schema-receipt semantic/cross-hash drifted] _
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:258: in test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed
+    _real_external_validation_inputs(helper)
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:164: in _real_external_validation_inputs
+    context = helper._validate_incident(
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:497: in _validate_incident
+    rows, all_row_ids = _build_rows(project_root, output, predecessor, runner)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:408: in _build_rows
+    _fail("Frozen diagnostic source manifest drifted")
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:199: in _fail
+    raise RuntimeError(message)
+E   RuntimeError: Frozen diagnostic source manifest drifted
+_ test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed[external-scheduling s01 success receipt-runtime_authority-True-receipt semantic/cross-hash drifted] _
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:258: in test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed
+    _real_external_validation_inputs(helper)
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:164: in _real_external_validation_inputs
+    context = helper._validate_incident(
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:497: in _validate_incident
+    rows, all_row_ids = _build_rows(project_root, output, predecessor, runner)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:408: in _build_rows
+    _fail("Frozen diagnostic source manifest drifted")
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:199: in _fail
+    raise RuntimeError(message)
+E   RuntimeError: Frozen diagnostic source manifest drifted
+_ test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed[external-scheduling s01 claim-handoff_receipt_sha256-0000000000000000000000000000000000000000000000000000000000000000-claim semantic/cross-hash drifted] _
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:258: in test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed
+    _real_external_validation_inputs(helper)
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:164: in _real_external_validation_inputs
+    context = helper._validate_incident(
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:497: in _validate_incident
+    rows, all_row_ids = _build_rows(project_root, output, predecessor, runner)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:408: in _build_rows
+    _fail("Frozen diagnostic source manifest drifted")
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:199: in _fail
+    raise RuntimeError(message)
+E   RuntimeError: Frozen diagnostic source manifest drifted
+_ test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed[external-scheduling s01 success seal-receipt_sha256-0000000000000000000000000000000000000000000000000000000000000000-seal semantic/cross-hash drifted] _
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:258: in test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed
+    _real_external_validation_inputs(helper)
+tests\test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py:164: in _real_external_validation_inputs
+    context = helper._validate_incident(
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:497: in _validate_incident
+    rows, all_row_ids = _build_rows(project_root, output, predecessor, runner)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:408: in _build_rows
+    _fail("Frozen diagnostic source manifest drifted")
+artifacts\v21e3r1_v8_work_20260822\run_frozen_diagnostic_metric_timeout_recovery_continuation.py:199: in _fail
+    raise RuntimeError(message)
+E   RuntimeError: Frozen diagnostic source manifest drifted
+_________ test_v4_v6_historical_releases_remain_exact_and_fail_closed _________
+tests\test_v21e3r1_historical_release_preservation.py:11: in test_v4_v6_historical_releases_remain_exact_and_fail_closed
+    result = verify_historical_releases(Path(".").resolve())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ijoc_submission_v21e3r1\scripts\verify_v21e3r1_historical_releases.py:119: in verify_historical_releases
+    raise FileNotFoundError(path)
+E   FileNotFoundError: __REPO_ROOT__\ijoc_submission_v21e3r1\release\ijoc_v21e3r1_development_results_v4.zip
+_____ test_real_boundary_freezer_receipts_are_consumed_and_hold_selection _____
+tests\test_v21e3r1_prospective_authorization.py:1775: in test_real_boundary_freezer_receipts_are_consumed_and_hold_selection
+    assert completed_freeze.returncode == 0, completed_freeze.stderr
+E   AssertionError: {"confirmation_authorized":false,"error":"registry does not resolve: [WinError 3] \u7cfb\u7edf\u627e\u4e0d\u5230\u6307\u5b9a\u7684\u8def\u5f84\u3002: '__REPO_ROOT__\\\\ijoc_submission_v21e3r1\\\\baselines\\\\v7_reference_comparator_registry.json'","formal_study_authorized":false,"ijoc_submission_status":"IJOC_HOLD","schema":"v21e3r1_prospective_boundary_freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}
+E     
+E   assert 3 == 0
+E    +  where 3 = CompletedProcess(args=['__PYTHON_PREFIX__\\python.exe', '-I', '__USER_HOME__\\Downloads\\MO_NCO_GITHUB_EXPORT_2026082..._freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}\n').returncode
+_______ test_baseline_v2_resealed_pass_remains_permanently_design_only ________
+tests\test_v21e3r1_prospective_authorization.py:1861: in test_baseline_v2_resealed_pass_remains_permanently_design_only
+    assert completed.returncode == 0, completed.stderr
+E   AssertionError: {"confirmation_authorized":false,"error":"registry does not resolve: [WinError 3] \u7cfb\u7edf\u627e\u4e0d\u5230\u6307\u5b9a\u7684\u8def\u5f84\u3002: '__REPO_ROOT__\\\\ijoc_submission_v21e3r1\\\\baselines\\\\v7_reference_comparator_registry.json'","formal_study_authorized":false,"ijoc_submission_status":"IJOC_HOLD","schema":"v21e3r1_prospective_boundary_freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}
+E     
+E   assert 3 == 0
+E    +  where 3 = CompletedProcess(args=['__PYTHON_PREFIX__\\python.exe', '-I', '__USER_HOME__\\Downloads\\MO_NCO_GITHUB_EXPORT_2026082..._freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}\n').returncode
+____ test_future_v3_contracts_are_machine_checked_and_always_hold_locally _____
+tests\test_v21e3r1_prospective_authorization.py:1967: in test_future_v3_contracts_are_machine_checked_and_always_hold_locally
+    assert completed.returncode == 0, completed.stderr
+E   AssertionError: {"confirmation_authorized":false,"error":"registry does not resolve: [WinError 3] \u7cfb\u7edf\u627e\u4e0d\u5230\u6307\u5b9a\u7684\u8def\u5f84\u3002: '__REPO_ROOT__\\\\ijoc_submission_v21e3r1\\\\baselines\\\\v7_reference_comparator_registry.json'","formal_study_authorized":false,"ijoc_submission_status":"IJOC_HOLD","schema":"v21e3r1_prospective_boundary_freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}
+E     
+E   assert 3 == 0
+E    +  where 3 = CompletedProcess(args=['__PYTHON_PREFIX__\\python.exe', '-I', '__USER_HOME__\\Downloads\\MO_NCO_GITHUB_EXPORT_2026082..._freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}\n').returncode
+_ test_design_only_external_v2_resealed_independence_true_is_integrity_error __
+tests\test_v21e3r1_prospective_authorization.py:2042: in test_design_only_external_v2_resealed_independence_true_is_integrity_error
+    assert completed_freeze.returncode == 0, completed_freeze.stderr
+E   AssertionError: {"confirmation_authorized":false,"error":"registry does not resolve: [WinError 3] \u7cfb\u7edf\u627e\u4e0d\u5230\u6307\u5b9a\u7684\u8def\u5f84\u3002: '__REPO_ROOT__\\\\ijoc_submission_v21e3r1\\\\baselines\\\\v7_reference_comparator_registry.json'","formal_study_authorized":false,"ijoc_submission_status":"IJOC_HOLD","schema":"v21e3r1_prospective_boundary_freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}
+E     
+E   assert 3 == 0
+E    +  where 3 = CompletedProcess(args=['__PYTHON_PREFIX__\\python.exe', '-I', '__USER_HOME__\\Downloads\\MO_NCO_GITHUB_EXPORT_2026082..._freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}\n').returncode
+_____ test_freezes_real_development_boundaries_without_granting_authority _____
+ijoc_submission_v21e3r1\scripts\freeze_v21e3r1_prospective_boundaries.py:229: in _contained_input
+    path = root.joinpath(*relative.parts).resolve(strict=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:670: in resolve
+    return self.with_segments(os.path.realpath(self, strict=strict))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [WinError 3] 系统找不到指定的路径。: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+
+During handling of the above exception, another exception occurred:
+tests\test_v21e3r1_prospective_boundary_freezer.py:42: in test_freezes_real_development_boundaries_without_granting_authority
+    receipt = module.freeze_prospective_boundaries(
+ijoc_submission_v21e3r1\scripts\freeze_v21e3r1_prospective_boundaries.py:1226: in freeze_prospective_boundaries
+    registry_path = _contained_input(root, REGISTRY_RELATIVE, label="registry")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ijoc_submission_v21e3r1\scripts\freeze_v21e3r1_prospective_boundaries.py:231: in _contained_input
+    _fail(f"{label} does not resolve: {error}")
+ijoc_submission_v21e3r1\scripts\freeze_v21e3r1_prospective_boundaries.py:96: in _fail
+    raise FreezeError(message)
+E   prospective_boundary_freezer.FreezeError: registry does not resolve: [WinError 3] 系统找不到指定的路径。: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+_________ test_real_boundary_receipts_build_a_consumable_v3_hold_spec _________
+tests\test_v21e3r1_prospective_gate_spec_builder.py:753: in test_real_boundary_receipts_build_a_consumable_v3_hold_spec
+    assert freeze.returncode == 0, freeze.stderr
+E   AssertionError: {"confirmation_authorized":false,"error":"registry does not resolve: [WinError 3] \u7cfb\u7edf\u627e\u4e0d\u5230\u6307\u5b9a\u7684\u8def\u5f84\u3002: '__REPO_ROOT__\\\\ijoc_submission_v21e3r1\\\\baselines\\\\v7_reference_comparator_registry.json'","formal_study_authorized":false,"ijoc_submission_status":"IJOC_HOLD","schema":"v21e3r1_prospective_boundary_freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}
+E     
+E   assert 3 == 0
+E    +  where 3 = CompletedProcess(args=['__PYTHON_PREFIX__\\python.exe', '-I', '__USER_HOME__\\Downloads\\MO_NCO_GITHUB_EXPORT_2026082..._freeze_error_v1","scientific_claim_authorized":false,"selection_authorized":false,"status":"HOLD_INTEGRITY_ERROR"}\n').returncode
+____________ test_real_registry_passes_strict_offline_verification ____________
+ijoc_submission_v21e3r1\scripts\verify_v21e3r1_reference_comparator_registry.py:805: in verify_registry
+    if not registry_file.resolve(strict=True).is_file():
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:670: in resolve
+    return self.with_segments(os.path.realpath(self, strict=strict))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [WinError 3] 系统找不到指定的路径。: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+
+During handling of the above exception, another exception occurred:
+tests\test_v21e3r1_reference_comparator_registry.py:70: in test_real_registry_passes_strict_offline_verification
+    receipt = VERIFIER.verify_registry(REGISTRY_PATH, REPOSITORY_ROOT)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ijoc_submission_v21e3r1\scripts\verify_v21e3r1_reference_comparator_registry.py:808: in verify_registry
+    _fail(f"registry does not exist: {exc}")
+ijoc_submission_v21e3r1\scripts\verify_v21e3r1_reference_comparator_registry.py:398: in _fail
+    raise RegistryVerificationError(message)
+E   v7_reference_registry_verifier.RegistryVerificationError: registry does not exist: [WinError 3] 系统找不到指定的路径。: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+__ test_registry_uses_honest_reference_classifications_and_budget_boundaries __
+tests\test_v21e3r1_reference_comparator_registry.py:86: in test_registry_uses_honest_reference_classifications_and_budget_boundaries
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+___________ test_resigned_formal_authorization_attempt_fails_closed ___________
+tests\test_v21e3r1_reference_comparator_registry.py:124: in test_resigned_formal_authorization_attempt_fails_closed
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+__________ test_resigned_strong_external_claim_attempt_fails_closed ___________
+tests\test_v21e3r1_reference_comparator_registry.py:140: in test_resigned_strong_external_claim_attempt_fails_closed
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+__________________ test_resigned_path_traversal_is_rejected ___________________
+tests\test_v21e3r1_reference_comparator_registry.py:152: in test_resigned_path_traversal_is_rejected
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+_______________ test_resigned_artifact_digest_drift_is_rejected _______________
+tests\test_v21e3r1_reference_comparator_registry.py:161: in test_resigned_artifact_digest_drift_is_rejected
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+_______ test_bool_fields_reject_integer_substitutes_even_when_resigned ________
+tests\test_v21e3r1_reference_comparator_registry.py:170: in test_bool_fields_reject_integer_substitutes_even_when_resigned
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+_______________ test_resigned_network_authorization_is_rejected _______________
+tests\test_v21e3r1_reference_comparator_registry.py:181: in test_resigned_network_authorization_is_rejected
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+____ test_resigned_command_or_budget_drift_is_rejected_by_comparator_seal _____
+tests\test_v21e3r1_reference_comparator_registry.py:194: in test_resigned_command_or_budget_drift_is_rejected_by_comparator_seal
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+__________________ test_payload_digest_mismatch_is_rejected ___________________
+tests\test_v21e3r1_reference_comparator_registry.py:205: in test_payload_digest_mismatch_is_rejected
+    registry = _registry()
+               ^^^^^^^^^^^
+tests\test_v21e3r1_reference_comparator_registry.py:40: in _registry
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+____________________ test_duplicate_json_keys_are_rejected ____________________
+tests\test_v21e3r1_reference_comparator_registry.py:215: in test_duplicate_json_keys_are_rejected
+    raw = REGISTRY_PATH.read_text(encoding="utf-8")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\baselines\\v7_reference_comparator_registry.json'
+_________ test_source_freeze_rejects_wrong_parent_development_source __________
+tests\test_v21e3r1_successor_development_factorial.py:392: in test_source_freeze_rejects_wrong_parent_development_source
+    receipt = _write_source_freeze_fixture(
+tests\test_v21e3r1_successor_development_factorial.py:91: in _write_source_freeze_fixture
+    target.write_bytes(source.read_bytes())
+                       ^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\development\\V21E3R1_V8_STRICT_EXECUTION_RUNBOOK_2026-08-23.md'
+________ test_source_freeze_binding_v2_carries_full_successor_lineage _________
+tests\test_v21e3r1_successor_development_factorial.py:405: in test_source_freeze_binding_v2_carries_full_successor_lineage
+    receipt = _write_source_freeze_fixture(project)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_successor_development_factorial.py:91: in _write_source_freeze_fixture
+    target.write_bytes(source.read_bytes())
+                       ^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\development\\V21E3R1_V8_STRICT_EXECUTION_RUNBOOK_2026-08-23.md'
+_____ test_source_freeze_accepts_canonical_materialized_archive_contract ______
+tests\test_v21e3r1_successor_development_factorial.py:424: in test_source_freeze_accepts_canonical_materialized_archive_contract
+    receipt_path = _write_source_freeze_fixture(project)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_successor_development_factorial.py:91: in _write_source_freeze_fixture
+    target.write_bytes(source.read_bytes())
+                       ^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\development\\V21E3R1_V8_STRICT_EXECUTION_RUNBOOK_2026-08-23.md'
+______ test_source_freeze_rejects_resealed_unrelated_semantic_parameters ______
+tests\test_v21e3r1_successor_development_factorial.py:449: in test_source_freeze_rejects_resealed_unrelated_semantic_parameters
+    receipt_path = _write_source_freeze_fixture(project)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_successor_development_factorial.py:91: in _write_source_freeze_fixture
+    target.write_bytes(source.read_bytes())
+                       ^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\development\\V21E3R1_V8_STRICT_EXECUTION_RUNBOOK_2026-08-23.md'
+_ test_source_freeze_consumer_rejects_unmanifested_executable_source_addition _
+tests\test_v21e3r1_successor_development_factorial.py:470: in test_source_freeze_consumer_rejects_unmanifested_executable_source_addition
+    receipt_path = _write_source_freeze_fixture(project)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_successor_development_factorial.py:91: in _write_source_freeze_fixture
+    target.write_bytes(source.read_bytes())
+                       ^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\development\\V21E3R1_V8_STRICT_EXECUTION_RUNBOOK_2026-08-23.md'
+_ test_source_freeze_revalidation_rejects_exact_type_and_archive_drift[float_entry_count] _
+tests\test_v21e3r1_successor_development_factorial.py:484: in test_source_freeze_revalidation_rejects_exact_type_and_archive_drift
+    receipt_path = _write_source_freeze_fixture(project)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_successor_development_factorial.py:91: in _write_source_freeze_fixture
+    target.write_bytes(source.read_bytes())
+                       ^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\development\\V21E3R1_V8_STRICT_EXECUTION_RUNBOOK_2026-08-23.md'
+_ test_source_freeze_revalidation_rejects_exact_type_and_archive_drift[unmaterialized_archive_binding] _
+tests\test_v21e3r1_successor_development_factorial.py:484: in test_source_freeze_revalidation_rejects_exact_type_and_archive_drift
+    receipt_path = _write_source_freeze_fixture(project)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_successor_development_factorial.py:91: in _write_source_freeze_fixture
+    target.write_bytes(source.read_bytes())
+                       ^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\development\\V21E3R1_V8_STRICT_EXECUTION_RUNBOOK_2026-08-23.md'
+__ test_real_n500_trace_matches_sealed_golden_and_exposes_distinct_identity ___
+tests\test_v21e3r1_successor_metric.py:177: in test_real_n500_trace_matches_sealed_golden_and_exposes_distinct_identity
+    assert trace.is_file() and frozen_receipt_path.is_file()
+E   AssertionError: assert (False)
+E    +  where False = is_file()
+E    +    where is_file = WindowsPath('__REPO_ROOT__/outputs/v21e3r1_v7_exposed_development_diagnostics_20260823/attempts/v21e3-motsp-development-n500-s00__seed-31059__arm-moead_seeded/attempt-0001/trace.sqlite3').is_file
+_____ test_factorial_runner_replays_metric_with_pinned_successor_identity _____
+tests\test_v21e3r1_successor_metric.py:254: in test_factorial_runner_replays_metric_with_pinned_successor_identity
+    receipt = factorial_runner._successor_independent_metric_replay(
+ijoc_submission_v21e3r1\scripts\run_v21e3r1_successor_development_factorial.py:280: in _successor_independent_metric_replay
+    raise ContractError(
+E   ijoc_submission_v21e3r1.scripts.run_v21e3r1_successor_development_factorial.ContractError: successor independent metric replay failed: Traceback (most recent call last):
+E     File "__REPO_ROOT__\independent_reproduction\recompute_v21e3r1_successor_metrics.py", line 324, in <module>
+E       raise SystemExit(main())
+E                        ~~~~^^
+E     File "__REPO_ROOT__\independent_reproduction\recompute_v21e3r1_successor_metrics.py", line 307, in main
+E       result = recompute(
+E           args.trace,
+E       ...<2 lines>...
+E           expected_evaluations=args.expected_evaluations,
+E       )
+E     File "__REPO_ROOT__\independent_reproduction\recompute_v21e3r1_successor_metrics.py", line 191, in recompute
+E       raise FileNotFoundError(path)
+E   FileNotFoundError: __REPO_ROOT__\outputs\v21e3r1_v7_exposed_development_diagnostics_20260823\attempts\v21e3-motsp-development-n500-s00__seed-31059__arm-moead_seeded\attempt-0001\trace.sqlite3
+________ test_cache_statement_matches_retry_without_optimizer_decision ________
+tests\test_v21e3r1_v6_claim_narrowing.py:21: in test_cache_statement_matches_retry_without_optimizer_decision
+    main = _read_v6("ijoc_v21e3r1_main_v6.tex")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_v6_claim_narrowing.py:13: in _read_v6
+    return (V6 / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\manuscript_v6_working\\ijoc_v21e3r1_main_v6.tex'
+_______ test_charged_count_is_durable_not_transient_physical_execution ________
+tests\test_v21e3r1_v6_claim_narrowing.py:28: in test_charged_count_is_durable_not_transient_physical_execution
+    main = _read_v6("ijoc_v21e3r1_main_v6.tex")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_v6_claim_narrowing.py:13: in _read_v6
+    return (V6 / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\manuscript_v6_working\\ijoc_v21e3r1_main_v6.tex'
+___________ test_development_statistics_are_explicitly_descriptive ____________
+tests\test_v21e3r1_v6_claim_narrowing.py:43: in test_development_statistics_are_explicitly_descriptive
+    text = _read(relative)
+           ^^^^^^^^^^^^^^^
+tests\test_v21e3r1_v6_claim_narrowing.py:9: in _read
+    return (ROOT / relative).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\manuscript_v6_working\\ijoc_v21e3r1_main_v6.tex'
+__________ test_six_case_trimmed_mean_is_not_presented_as_robustness __________
+tests\test_v21e3r1_v6_claim_narrowing.py:49: in test_six_case_trimmed_mean_is_not_presented_as_robustness
+    main = _read_v6("ijoc_v21e3r1_main_v6.tex")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_v6_claim_narrowing.py:13: in _read_v6
+    return (V6 / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\manuscript_v6_working\\ijoc_v21e3r1_main_v6.tex'
+___________ test_native_portfolio_and_no_clipping_claims_are_scoped ___________
+tests\test_v21e3r1_v6_claim_narrowing.py:57: in test_native_portfolio_and_no_clipping_claims_are_scoped
+    main = _read_v6("ijoc_v21e3r1_main_v6.tex")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_v6_claim_narrowing.py:13: in _read_v6
+    return (V6 / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\manuscript_v6_working\\ijoc_v21e3r1_main_v6.tex'
+____________ test_v6_preserves_historical_matrix_identity_and_hold ____________
+tests\test_v21e3r1_v6_claim_narrowing.py:66: in test_v6_preserves_historical_matrix_identity_and_hold
+    status = _read_v6("submission_status_v6.tex")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_v6_claim_narrowing.py:13: in _read_v6
+    return (V6 / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\manuscript_v6_working\\submission_status_v6.tex'
+________ test_exact_objective_type_repair_is_not_back_projected_to_v4 _________
+tests\test_v21e3r1_v6_claim_narrowing.py:74: in test_exact_objective_type_repair_is_not_back_projected_to_v4
+    supplement = _read_v6("ijoc_v21e3r1_supplement_v6.tex")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_v21e3r1_v6_claim_narrowing.py:13: in _read_v6
+    return (V6 / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+__PYTHON_PREFIX__\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: '__REPO_ROOT__\\ijoc_submission_v21e3r1\\manuscript_v6_working\\ijoc_v21e3r1_supplement_v6.tex'
+=========================== short test summary info ===========================
+FAILED tests/test_algorithm_configuration_preflight.py::AlgorithmConfigurationPreflightTests::test_complete_manifest_is_built_without_objective_evaluation
+FAILED tests/test_benchmark.py::BenchmarkTests::test_frozen_v11_suite_binds_integer_matrix_artifacts
+FAILED tests/test_benchmark.py::BenchmarkTests::test_pilot_confirm_v11_alias_charges_both_streams
+FAILED tests/test_benchmark.py::BenchmarkTests::test_pilot_confirm_v12_alias_binds_regeneration_commitment
+FAILED tests/test_benchmark.py::BenchmarkTests::test_v12_benchmark_record_carries_publication_packet_gate
+FAILED tests/test_ijoc_algorithm_adapters.py::IJOCAlgorithmAdapterTests::test_frozen_motsp_packets_are_in_the_exact_integer_domain
+FAILED tests/test_ijoc_algorithm_adapters.py::IJOCAlgorithmAdapterTests::test_motsp_pls_adapter_and_independent_replay
+FAILED tests/test_ijoc_algorithm_adapters.py::IJOCAlgorithmAdapterTests::test_motsp_pls_restart_v2_adapter_and_independent_replay
+SUBFAILED(algorithm='pymoo-nsga2') tests/test_ijoc_algorithm_adapters.py::IJOCAlgorithmAdapterTests::test_motsp_pymoo_adapters_and_independent_replay
+SUBFAILED(algorithm='pymoo-moead') tests/test_ijoc_algorithm_adapters.py::IJOCAlgorithmAdapterTests::test_motsp_pymoo_adapters_and_independent_replay
+FAILED tests/test_ijoc_algorithm_adapters.py::IJOCAlgorithmAdapterTests::test_motsp_treatment_adapter_and_independent_replay
+FAILED tests/test_pareto_fixed_schedule_certificate.py::FixedScheduleReferenceCertificateTests::test_fixed_reference_duplicate_json_fields_fail_closed
+FAILED tests/test_pareto_fixed_schedule_certificate.py::FixedScheduleReferenceCertificateTests::test_fixed_reference_numeric_strings_and_booleans_fail_closed
+FAILED tests/test_pareto_ijoc_experiment_infrastructure.py::IJOCExperimentInfrastructureTests::test_postrun_accepts_complete_bound_receipts_and_detects_tamper
+FAILED tests/test_pareto_ijoc_experiment_infrastructure.py::IJOCExperimentInfrastructureTests::test_postrun_cli_exposes_retry_and_resource_verdicts
+FAILED tests/test_pareto_ijoc_formal_analysis.py::IJOCFormalAnalysisTests::test_completed_matrix_is_recomputed_bound_and_gated_end_to_end
+FAILED tests/test_pareto_ijoc_nested_verification.py::NestedEvidenceVerificationTests::test_cli_emits_machine_readable_pass_summary
+FAILED tests/test_pareto_ijoc_reference_calibration.py::test_real_two_family_gate_is_hash_bound_and_idempotent
+FAILED tests/test_pareto_ijoc_reference_calibration.py::test_verifier_rejects_tampered_case_artifact
+FAILED tests/test_pareto_ijoc_reference_calibration.py::test_content_addressed_verifier_imports_only_from_frozen_pythonpath
+FAILED tests/test_pareto_ijoc_submission_manifest.py::test_cli_build_verify_and_audit_round_trip
+FAILED tests/test_pareto_ijoc_tail_calibration.py::TailCalibrationFreezeContractTests::test_decision_rule_digest_matches_formal_freezer_canonical_value
+FAILED tests/test_pareto_ijoc_versioned_refreeze.py::VersionedReleaseArchiveTests::test_versioned_release_build_emits_bound_outputs_only
+FAILED tests/test_pareto_ijoc_versioned_refreeze.py::VersionedFreezeRequestTests::test_paired_analysis_contract_accepts_restart_v2_baseline
+FAILED tests/test_pareto_ijoc_versioned_refreeze.py::VersionedFreezeRequestTests::test_successor_analysis_plan_has_only_predeclared_differences
+FAILED tests/test_pareto_ijoc_versioned_refreeze.py::VersionedFreezeRequestTests::test_successor_changes_only_the_motsp_pls_baseline_arm
+FAILED tests/test_pareto_ijoc_versioned_refreeze.py::VersionedFreezeRequestTests::test_successor_request_binds_identity_and_exact_archive_provenance
+FAILED tests/test_pareto_v21_code_release.py::test_release_zip_is_deterministic_and_manifest_binds_every_entry
+FAILED tests/test_pareto_v21_code_release.py::test_explicit_allowlist_includes_v3_inputs_and_excludes_large_evidence
+FAILED tests/test_pareto_v21_code_release.py::test_release_boundary_is_fail_closed_and_outputs_are_immutable
+FAILED tests/test_pareto_v21_code_release.py::test_release_readme_states_code_only_and_formal_gate_boundary
+FAILED tests/test_pareto_v21_confirmation.py::test_confirmation_gate_cli_writes_authoritative_receipt
+FAILED tests/test_pareto_v21e3r1_release_dynamic_dependencies.py::test_verified_release_selects_snapshot_dynamic_dependencies_and_inventories_parent
+FAILED tests/test_pareto_v21e3r1_release_dynamic_dependencies.py::test_verified_release_rejects_parent_substitution_when_snapshot_omits_paths
+FAILED tests/test_pareto_v21e3r1_snapshot_dynamic_dependencies.py::test_prospective_snapshot_binds_v21e3_scripts_loaded_by_tests
+FAILED tests/test_pareto_v21e3r1_snapshot_dynamic_dependencies.py::test_independent_preflight_reconstructs_the_same_prospective_path_set
+FAILED tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery.py::test_real_postincident_predecessor_preflight_fails_closed_and_is_read_only
+FAILED tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::test_real_incident_preflight_is_read_only_and_requires_fresh_exact17
+FAILED tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::test_external_scheduling_missing_bound_file_is_fail_closed
+FAILED tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::test_external_scheduling_raw_receipt_tamper_is_fail_closed
+FAILED tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed[external-scheduling s01 success receipt-schema-drifted_schema-receipt semantic/cross-hash drifted]
+FAILED tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed[external-scheduling s01 success receipt-runtime_authority-True-receipt semantic/cross-hash drifted]
+FAILED tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed[external-scheduling s01 claim-handoff_receipt_sha256-0000000000000000000000000000000000000000000000000000000000000000-claim semantic/cross-hash drifted]
+FAILED tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed[external-scheduling s01 success seal-receipt_sha256-0000000000000000000000000000000000000000000000000000000000000000-seal semantic/cross-hash drifted]
+FAILED tests/test_v21e3r1_historical_release_preservation.py::test_v4_v6_historical_releases_remain_exact_and_fail_closed
+FAILED tests/test_v21e3r1_prospective_authorization.py::test_real_boundary_freezer_receipts_are_consumed_and_hold_selection
+FAILED tests/test_v21e3r1_prospective_authorization.py::test_baseline_v2_resealed_pass_remains_permanently_design_only
+FAILED tests/test_v21e3r1_prospective_authorization.py::test_future_v3_contracts_are_machine_checked_and_always_hold_locally
+FAILED tests/test_v21e3r1_prospective_authorization.py::test_design_only_external_v2_resealed_independence_true_is_integrity_error
+FAILED tests/test_v21e3r1_prospective_boundary_freezer.py::test_freezes_real_development_boundaries_without_granting_authority
+FAILED tests/test_v21e3r1_prospective_gate_spec_builder.py::test_real_boundary_receipts_build_a_consumable_v3_hold_spec
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_real_registry_passes_strict_offline_verification
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_registry_uses_honest_reference_classifications_and_budget_boundaries
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_resigned_formal_authorization_attempt_fails_closed
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_resigned_strong_external_claim_attempt_fails_closed
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_resigned_path_traversal_is_rejected
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_resigned_artifact_digest_drift_is_rejected
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_bool_fields_reject_integer_substitutes_even_when_resigned
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_resigned_network_authorization_is_rejected
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_resigned_command_or_budget_drift_is_rejected_by_comparator_seal
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_payload_digest_mismatch_is_rejected
+FAILED tests/test_v21e3r1_reference_comparator_registry.py::test_duplicate_json_keys_are_rejected
+FAILED tests/test_v21e3r1_successor_development_factorial.py::test_source_freeze_rejects_wrong_parent_development_source
+FAILED tests/test_v21e3r1_successor_development_factorial.py::test_source_freeze_binding_v2_carries_full_successor_lineage
+FAILED tests/test_v21e3r1_successor_development_factorial.py::test_source_freeze_accepts_canonical_materialized_archive_contract
+FAILED tests/test_v21e3r1_successor_development_factorial.py::test_source_freeze_rejects_resealed_unrelated_semantic_parameters
+FAILED tests/test_v21e3r1_successor_development_factorial.py::test_source_freeze_consumer_rejects_unmanifested_executable_source_addition
+FAILED tests/test_v21e3r1_successor_development_factorial.py::test_source_freeze_revalidation_rejects_exact_type_and_archive_drift[float_entry_count]
+FAILED tests/test_v21e3r1_successor_development_factorial.py::test_source_freeze_revalidation_rejects_exact_type_and_archive_drift[unmaterialized_archive_binding]
+FAILED tests/test_v21e3r1_successor_metric.py::test_real_n500_trace_matches_sealed_golden_and_exposes_distinct_identity
+FAILED tests/test_v21e3r1_successor_metric.py::test_factorial_runner_replays_metric_with_pinned_successor_identity
+FAILED tests/test_v21e3r1_v6_claim_narrowing.py::test_cache_statement_matches_retry_without_optimizer_decision
+FAILED tests/test_v21e3r1_v6_claim_narrowing.py::test_charged_count_is_durable_not_transient_physical_execution
+FAILED tests/test_v21e3r1_v6_claim_narrowing.py::test_development_statistics_are_explicitly_descriptive
+FAILED tests/test_v21e3r1_v6_claim_narrowing.py::test_six_case_trimmed_mean_is_not_presented_as_robustness
+FAILED tests/test_v21e3r1_v6_claim_narrowing.py::test_native_portfolio_and_no_clipping_claims_are_scoped
+FAILED tests/test_v21e3r1_v6_claim_narrowing.py::test_v6_preserves_historical_matrix_identity_and_hold
+FAILED tests/test_v21e3r1_v6_claim_narrowing.py::test_exact_objective_type_repair_is_not_back_projected_to_v4
+78 failed, 1328 passed, 4 skipped, 267 subtests passed in 595.57s (0:09:55)

@@ -1,20 +1,22 @@
-name: V9R2R1 full repository contract
+name: V9R2R1 repository evidence contracts
 
 on:
+  push:
+  pull_request:
   workflow_dispatch:
     inputs:
-      run_full_live:
-        description: Run the complete public-checkout suite instead of reference-evidence replay only
+      run_public_checkout_live:
+        description: Re-run the public checkout and verify its exact expected 78-outcome failure contract
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
   contents: read
 
 jobs:
-  exact-reference-evidence:
-    name: Byte-bound exact-eight reference evidence
+  public-checkout-reference-contract:
+    name: Public checkout expected-failure reference (78 outcomes)
     runs-on: windows-latest
     timeout-minutes: 10
     steps:
@@ -24,28 +26,84 @@ jobs:
         with:
           python-version: "3.13.12"
 
-      - name: Verify reference JUnit bytes and exact historical node-ids
+      - name: Verify current 203-file source and 136-module test closure
         shell: pwsh
         run: |
-          $receipt = Join-Path $env:RUNNER_TEMP 'expected-historical-v8-failures.json'
+          $ErrorActionPreference = 'Stop'
+          python scripts/verify_v9r2r1_current_source.py `
+            --root . `
+            --manifest V21E3R1_V9R2R1_SOURCE_MANIFEST.json `
+            --require-git-tracked `
+            --require-pass
+          if ($LASTEXITCODE -ne 0) { throw 'current public source closure drifted' }
+          python scripts/build_v9r2r1_full_suite_test_manifest.py verify `
+            --root . `
+            --manifest provenance/V9R2R1_FULL_SUITE_TEST_MANIFEST.json
+          if ($LASTEXITCODE -ne 0) { throw 'current public test-source closure drifted' }
+
+      - name: Verify checked-in sanitized public-checkout evidence
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $receipt = Join-Path $env:RUNNER_TEMP 'public-checkout-reference-contract.json'
+          python scripts/sanitize_public_checkout_outputs.py verify `
+            --receipt provenance/V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json `
+            --junit evidence/public_checkout/full_repository.sanitized.junit.xml `
+            --log evidence/public_checkout/full_repository.sanitized.log
+          if ($LASTEXITCODE -ne 0) { throw 'checked-in public evidence sanitization receipt drifted' }
+          python scripts/verify_expected_public_checkout_failure_set.py `
+            --registry provenance/V9R2R1_EXPECTED_PUBLIC_CHECKOUT_FAILURE_SET.json `
+            --junit evidence/public_checkout/full_repository.sanitized.junit.xml `
+            --log evidence/public_checkout/full_repository.sanitized.log `
+            --require-reference-evidence-sha256 `
+            --output $receipt
+          if ($LASTEXITCODE -ne 0) { throw 'public-checkout reference failure contract drifted' }
+          Write-Host 'PASS public-checkout reference contract: 78 expected failed outcomes (77 JUnit failing/error testcases), classified 70 held, 7 frozen-V8, 1 sealed-output.'
+          Write-Warning 'This is public engineering evidence, not repository-wide green and not an internal complete-tree result.'
+
+      - name: Upload public-checkout reference receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9r2r1-public-checkout-reference-contract
+          path: ${{ runner.temp }}/public-checkout-reference-contract.json
+          if-no-files-found: error
+
+  internal-complete-tree-reference:
+    name: Internal complete-tree historical reference (exact eight)
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.12"
+
+      - name: Verify byte-bound internal complete-tree reference only
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $receipt = Join-Path $env:RUNNER_TEMP 'internal-complete-tree-exact-eight-reference.json'
           python scripts/verify_expected_historical_failure_set.py `
             --registry provenance/V9R2R1_EXPECTED_HISTORICAL_V8_FAILURE_SET.json `
             --junit evidence/v9r2r1_environment_recovery_20260825_002/full_repository.junit.xml `
             --require-reference-sha256 `
             --output $receipt
-          if ($LASTEXITCODE -ne 0) { throw 'reference exact-eight evidence drifted' }
-          Write-Host 'PASS byte-bound historical engineering reference; repository-wide green remains FALSE.'
+          if ($LASTEXITCODE -ne 0) { throw 'internal complete-tree exact-eight reference drifted' }
+          Write-Host 'PASS byte-bound internal complete-tree historical reference: exact eight frozen-V8 failures.'
+          Write-Warning 'Reference replay does not describe the current public checkout and does not grant access to withheld internal dependencies.'
 
-      - name: Upload reference verification receipt
+      - name: Upload internal complete-tree reference receipt
         uses: actions/upload-artifact@v4
         with:
-          name: v9r2r1-exact-eight-reference
-          path: ${{ runner.temp }}/expected-historical-v8-failures.json
+          name: v9r2r1-internal-complete-tree-exact-eight-reference
+          path: ${{ runner.temp }}/internal-complete-tree-exact-eight-reference.json
           if-no-files-found: error
 
-  full-repository-contract:
-    name: Full-live exact eight or fail closed
-    if: ${{ inputs.run_full_live }}
+  public-checkout-live-contract:
+    name: Public checkout live expected-failure contract
+    needs: public-checkout-reference-contract
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_public_checkout_live }}
     runs-on: windows-latest
     timeout-minutes: 35
     steps:
@@ -56,6 +114,21 @@ jobs:
           python-version: "3.13.12"
           cache: pip
           cache-dependency-path: requirements/optional-pymoo.lock
+
+      - name: Verify live checkout source and test closure
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          python scripts/verify_v9r2r1_current_source.py `
+            --root . `
+            --manifest V21E3R1_V9R2R1_SOURCE_MANIFEST.json `
+            --require-git-tracked `
+            --require-pass
+          if ($LASTEXITCODE -ne 0) { throw 'live public source closure drifted' }
+          python scripts/build_v9r2r1_full_suite_test_manifest.py verify `
+            --root . `
+            --manifest provenance/V9R2R1_FULL_SUITE_TEST_MANIFEST.json
+          if ($LASTEXITCODE -ne 0) { throw 'live public test-source closure drifted' }
 
       - name: Verify requirement-file checksums
         shell: pwsh
@@ -70,6 +143,7 @@ jobs:
       - name: Install observed full-suite version closure
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
           python -m pip install --no-deps -r requirements/optional-pymoo.lock
           if ($LASTEXITCODE -ne 0) { throw 'optional pymoo lock installation failed' }
           python -m pip check
@@ -80,51 +154,92 @@ jobs:
       - name: Fail-fast backend preflight
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
           $python = (Get-Command python).Source
-          $receipt = Join-Path $env:RUNNER_TEMP 'full_suite_environment_preflight.json'
+          $receipt = Join-Path $env:RUNNER_TEMP 'public_checkout_live_environment_preflight.json'
           python scripts/check_v9r2r1_full_suite_environment.py `
             --expected-python-executable $python `
             --expected-python-version-prefix 3.13.12 `
             --expected-pymoo-version 0.6.1.6 `
             --expected-moocore-version 0.3.1 `
             --output $receipt
-          if ($LASTEXITCODE -ne 0) { throw 'HOLD_FULL_SUITE_ENVIRONMENT' }
+          if ($LASTEXITCODE -ne 0) { throw 'HOLD_PUBLIC_CHECKOUT_LIVE_ENVIRONMENT' }
           Write-Warning 'This CI environment is version-pinned but is not the artifact-hashed Anaconda recovery environment.'
 
-      - name: Re-run pymoo recovery seam
+      - name: Run and verify exact public-checkout failure contract
         shell: pwsh
         run: |
-          python -m pytest -q -p no:cacheprovider --tb=short `
-            --junitxml="$env:RUNNER_TEMP\pymoo-recovery.junit.xml" `
-            tests/test_external_pymoo_baseline.py `
-            tests/test_ijoc_algorithm_adapters.py `
-            -k pymoo
-          if ($LASTEXITCODE -ne 0) { throw 'pymoo recovery regression failed' }
-
-      - name: Run and classify full repository suite
-        shell: pwsh
-        run: |
-          $junit = Join-Path $env:RUNNER_TEMP 'full-repository.junit.xml'
-          $receipt = Join-Path $env:RUNNER_TEMP 'expected-historical-v8-failures.json'
-          python -m pytest -q -p no:cacheprovider --tb=short --junitxml=$junit
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $env:TEMP = $env:RUNNER_TEMP
+          $env:TMP = $env:RUNNER_TEMP
+          $junit = Join-Path $env:RUNNER_TEMP 'public-checkout-live.junit.xml'
+          $log = Join-Path $env:RUNNER_TEMP 'public-checkout-live.log'
+          $receipt = Join-Path $env:RUNNER_TEMP 'public-checkout-live-contract.raw-local-only.json'
+          python -m pytest -q -p no:cacheprovider --tb=short --color=no --junitxml=$junit *> $log
           $pytestExit = $LASTEXITCODE
-          if ($pytestExit -ne 1) { throw "expected pytest exit 1 for the frozen V8 drift set, got $pytestExit" }
-          python scripts/verify_expected_historical_failure_set.py `
-            --registry provenance/V9R2R1_EXPECTED_HISTORICAL_V8_FAILURE_SET.json `
+          if ($pytestExit -ne 1) { throw "expected pytest exit 1 before contract verification, got $pytestExit" }
+          python scripts/verify_expected_public_checkout_failure_set.py `
+            --registry provenance/V9R2R1_EXPECTED_PUBLIC_CHECKOUT_FAILURE_SET.json `
             --junit $junit `
+            --log $log `
             --output $receipt
-          if ($LASTEXITCODE -ne 0) { throw 'exact historical failure node-id contract drifted' }
-          Write-Host 'PASS_EXPECTED_FROZEN_V8_FAILURE_SET: 8 failures, 0 errors, 4 skips.'
-          Write-Warning 'Repository-wide green remains FALSE; failures were executed and were not xfailed or skipped.'
+          if ($LASTEXITCODE -ne 0) { throw 'public-checkout exact failure contract drifted' }
+          Write-Host 'PASS_EXPECTED_PUBLIC_CHECKOUT_FAILURE_SET: 78 expected failed outcomes, 0 unexpected failures.'
+          Write-Warning 'Repository-wide green remains FALSE; expected failures were executed and were not xfailed, skipped, or converted to success.'
 
-      - name: Upload environment and JUnit evidence
+      - name: Sanitize and reverify live public-checkout evidence
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $rawJunit = Join-Path $env:RUNNER_TEMP 'public-checkout-live.junit.xml'
+          $rawLog = Join-Path $env:RUNNER_TEMP 'public-checkout-live.log'
+          $safeJunit = Join-Path $env:RUNNER_TEMP 'full_repository.sanitized.junit.xml'
+          $safeLog = Join-Path $env:RUNNER_TEMP 'full_repository.sanitized.log'
+          $sanitizationReceipt = Join-Path $env:RUNNER_TEMP 'V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json'
+          $contractReceipt = Join-Path $env:RUNNER_TEMP 'public-checkout-live-contract.sanitized.json'
+          $referenceCommit = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve live checkout commit' }
+          $referenceTree = (git rev-parse 'HEAD^{tree}').Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve live checkout tree' }
+          $pythonPrefix = (python -c "import sys; print(sys.prefix)").Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'could not resolve live Python prefix' }
+          python scripts/sanitize_public_checkout_outputs.py create `
+            --raw-junit $rawJunit `
+            --raw-log $rawLog `
+            --output-junit $safeJunit `
+            --output-log $safeLog `
+            --receipt $sanitizationReceipt `
+            --repository-root $env:GITHUB_WORKSPACE `
+            --user-home $env:USERPROFILE `
+            --environment-prefix $pythonPrefix `
+            --temp-root $env:RUNNER_TEMP `
+            --host-name $env:COMPUTERNAME `
+            --reference-commit $referenceCommit `
+            --reference-tree $referenceTree
+          if ($LASTEXITCODE -ne 0) { throw 'live public-checkout evidence sanitization failed' }
+          python scripts/sanitize_public_checkout_outputs.py verify `
+            --receipt $sanitizationReceipt `
+            --junit $safeJunit `
+            --log $safeLog
+          if ($LASTEXITCODE -ne 0) { throw 'sanitized live evidence verification failed' }
+          python scripts/verify_expected_public_checkout_failure_set.py `
+            --registry provenance/V9R2R1_EXPECTED_PUBLIC_CHECKOUT_FAILURE_SET.json `
+            --junit $safeJunit `
+            --log $safeLog `
+            --output $contractReceipt
+          if ($LASTEXITCODE -ne 0) { throw 'sanitized live failure contract drifted' }
+          Write-Host 'PASS sanitized live evidence preserves the exact public-checkout failure contract.'
+
+      - name: Upload live public-checkout evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v9r2r1-full-repository-contract
+          name: v9r2r1-public-checkout-live-contract
           path: |
-            ${{ runner.temp }}/full_suite_environment_preflight.json
-            ${{ runner.temp }}/pymoo-recovery.junit.xml
-            ${{ runner.temp }}/full-repository.junit.xml
-            ${{ runner.temp }}/expected-historical-v8-failures.json
+            ${{ runner.temp }}/public_checkout_live_environment_preflight.json
+            ${{ runner.temp }}/full_repository.sanitized.junit.xml
+            ${{ runner.temp }}/full_repository.sanitized.log
+            ${{ runner.temp }}/V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json
+            ${{ runner.temp }}/public-checkout-live-contract.sanitized.json
           if-no-files-found: warn
