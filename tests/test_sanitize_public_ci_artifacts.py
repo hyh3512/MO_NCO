@@ -390,6 +390,42 @@ def test_strict_json_raw_private_path_is_sanitized_before_public_scan(
     )["status"] == SANITIZER.PASS_STATUS
 
 
+def test_strict_json_line_log_preserves_encoded_relative_suffix(
+    tmp_path: Path,
+) -> None:
+    raw_log = _canonical_json(
+        {"native_artifact": r"C:\Python311\Lib\site-packages\module.pyd"}
+    ) + b"\n"
+    kinds = {"environment-preflight.log": "STRICT_JSON"}
+    receipt, outputs, receipt_path = _create_bundle(
+        tmp_path,
+        {"environment-preflight.log": raw_log},
+        kinds=kinds,
+    )
+
+    assert json.loads(
+        outputs["environment-preflight.log"].read_text("utf-8")
+    ) == {
+        "native_artifact": "__PYTHON_PREFIX__\\Lib\\site-packages\\module.pyd"
+    }
+    assert _verify_bundle(
+        receipt_path=receipt_path,
+        outputs=outputs,
+        kinds=kinds,
+    ) == receipt
+
+
+def test_live_preflight_stdout_is_declared_as_strict_json() -> None:
+    workflow = (
+        ROOT / ".github/workflows/full-repository-contract.yml"
+    ).read_text(encoding="utf-8")
+
+    assert workflow.count(
+        '--kind "environment-preflight.log=STRICT_JSON"'
+    ) == 2
+    assert 'environment-preflight.log=UTF8_TEXT' not in workflow
+
+
 def test_junit_host_replacement_is_limited_to_testsuite_hostname(
     tmp_path: Path,
 ) -> None:

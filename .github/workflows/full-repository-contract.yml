@@ -190,7 +190,7 @@ jobs:
             --output "environment-preflight.json=$safePreflight" `
             --output "environment-preflight.log=$safeLog" `
             --kind "environment-preflight.json=STRICT_JSON" `
-            --kind "environment-preflight.log=UTF8_TEXT" `
+            --kind "environment-preflight.log=STRICT_JSON" `
             --receipt $receipt `
             --repository-root $env:GITHUB_WORKSPACE `
             --temp-root $env:RUNNER_TEMP `
@@ -204,7 +204,7 @@ jobs:
             --output "environment-preflight.json=$safePreflight" `
             --output "environment-preflight.log=$safeLog" `
             --kind "environment-preflight.json=STRICT_JSON" `
-            --kind "environment-preflight.log=UTF8_TEXT" `
+            --kind "environment-preflight.log=STRICT_JSON" `
             --receipt $receipt `
             --repository-root $env:GITHUB_WORKSPACE `
             --user-home $env:USERPROFILE `
