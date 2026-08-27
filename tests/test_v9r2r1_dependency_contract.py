@@ -105,3 +105,27 @@ def test_requirement_integrity_manifest_and_environment_spec_match_bytes() -> No
     assert checksums == spec_checksums
     for relative_path, expected in checksums.items():
         assert hashlib.sha256((ROOT / relative_path).read_bytes()).hexdigest() == expected
+
+
+def test_public_live_workflow_materializes_observed_interpreter_identities() -> None:
+    workflow = (
+        ROOT / ".github/workflows/full-repository-contract.yml"
+    ).read_text(encoding="utf-8")
+    live = workflow.split(
+        "  public-checkout-live-contract:\n", maxsplit=1
+    )[1]
+
+    assert "actions/setup-python" not in live
+    for exact in (
+        r"C:\Miniconda\Scripts\conda.exe",
+        r"C:\miniconda3\python.exe",
+        r"C:\miniconda3\envs\ssm_env\python.exe",
+        "python=3.13.12=h39c999c_100_cp313",
+        "python=3.11.15=h1044e36_0",
+        "f77193cf0405ab440c39324bdb2f8864596321c1df888adbbe357f3d760f4716",
+        "418228fb1417da15512fc44aba6f2e1d948786878ffd06fd661881c6d104c0f6",
+        "V9R2R1_LIVE_PYTHON=C:\\miniconda3\\python.exe",
+        "--basetemp=$baseTemp",
+        "artifact-hashed environment lock remains false",
+    ):
+        assert exact in live

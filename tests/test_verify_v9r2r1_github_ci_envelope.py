@@ -69,6 +69,16 @@ def _job(run_id: int, job_id: int, *, conclusion: str = "success") -> dict:
         2008: VERIFIER._EVIDENCE_JOB_NAMES["public_live_failure_contract"],
         2099: VERIFIER._EVIDENCE_JOB_NAMES["public_live_failure_contract"],
     }
+    steps = []
+    if conclusion == "success":
+        steps = [
+            {
+                "number": 1,
+                "name": "complete",
+                "status": "completed",
+                "conclusion": conclusion,
+            }
+        ]
     return {
         "job_id": job_id,
         "name": names[job_id],
@@ -79,14 +89,7 @@ def _job(run_id: int, job_id: int, *, conclusion: str = "success") -> dict:
             f"https://github.com/hyh3512/MO_NCO/actions/runs/{run_id}/job/"
             f"{job_id}"
         ),
-        "steps": [
-            {
-                "number": 1,
-                "name": "complete",
-                "status": "completed",
-                "conclusion": conclusion,
-            }
-        ],
+        "steps": steps,
     }
 
 
@@ -627,6 +630,34 @@ def test_complete_envelope_cross_binds_runs_artifacts_members_and_holds(
     assert result["repository_wide_green"] is False
     assert result["scientific_stage_authorized"] is False
     assert result["development_study_readiness"] == "PRE_DEVELOPMENT_HOLD"
+
+
+def test_successful_job_requires_nonempty_steps(tmp_path: Path) -> None:
+    payload = _payload()
+    payload["runs"]["push_current_source"]["jobs"][0]["steps"] = []
+    with pytest.raises(
+        VERIFIER.GitHubCIEnvelopeVerificationError,
+        match="job steps do not match the job conclusion",
+    ):
+        _verify(tmp_path, payload)
+
+
+def test_skipped_job_requires_empty_steps(tmp_path: Path) -> None:
+    payload = _payload()
+    skipped_job = payload["runs"]["push_repository_contract"]["jobs"][2]
+    skipped_job["steps"] = [
+        {
+            "number": 1,
+            "name": "not-run",
+            "status": "completed",
+            "conclusion": "skipped",
+        }
+    ]
+    with pytest.raises(
+        VERIFIER.GitHubCIEnvelopeVerificationError,
+        match="job steps do not match the job conclusion",
+    ):
+        _verify(tmp_path, payload)
 
 
 def test_duplicate_json_keys_are_rejected(tmp_path: Path) -> None:

@@ -598,8 +598,14 @@ def _validate_jobs(
             )
         jobs_by_id[job_id] = job
         steps = job["steps"]
-        if type(steps) is not list or not steps:
-            raise GitHubCIEnvelopeVerificationError("job steps missing")
+        if (
+            type(steps) is not list
+            or (job["conclusion"] == "success" and not steps)
+            or (job["conclusion"] == "skipped" and steps)
+        ):
+            raise GitHubCIEnvelopeVerificationError(
+                "job steps do not match the job conclusion"
+            )
         numbers: set[int] = set()
         for step_index, raw_step in enumerate(steps):
             step = _require_keys(

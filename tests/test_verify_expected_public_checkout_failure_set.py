@@ -54,6 +54,81 @@ def _replace_failure_marker(
     return output
 
 
+def _append_unexpected_junit_failure(tmp_path: Path) -> tuple[Path, str]:
+    tree = ET.parse(JUNIT)
+    suite = next(tree.getroot().iter("testsuite"))
+    node_id = "tests/test_public_contract_probe.py::test_unexpected_failure"
+    testcase = ET.SubElement(
+        suite,
+        "testcase",
+        {
+            "classname": "tests.test_public_contract_probe",
+            "name": "test_unexpected_failure",
+            "time": "0.001",
+        },
+    )
+    failure = ET.SubElement(
+        testcase,
+        "failure",
+        {"message": "AssertionError: unexpected public failure"},
+    )
+    failure.text = "AssertionError: unexpected public failure"
+    suite.attrib["tests"] = str(int(suite.attrib["tests"]) + 1)
+    suite.attrib["failures"] = str(int(suite.attrib["failures"]) + 1)
+    output = tmp_path / "unexpected-failure.junit.xml"
+    tree.write(output, encoding="utf-8", xml_declaration=True)
+    return output, node_id
+
+
+def test_unexpected_junit_node_is_reported_before_count_drift(
+    tmp_path: Path,
+) -> None:
+    junit, node_id = _append_unexpected_junit_failure(tmp_path)
+
+    with pytest.raises(
+        VERIFIER.PublicCheckoutFailureSetError,
+        match=(
+            "exact JUnit failure node-id set drifted; missing=\\[\\]; "
+            f"unexpected=\\['{node_id}'\\]"
+        ),
+    ):
+        VERIFIER.verify_expected_failure_set(REGISTRY, junit, LOG)
+
+
+@pytest.mark.parametrize(
+    "terminal_failed_count",
+    [78, 79],
+    ids=["terminal-count-stale", "terminal-count-drifted"],
+)
+def test_duplicate_pytest_outcome_reports_unexpected_multiplicity_before_counts(
+    tmp_path: Path,
+    terminal_failed_count: int,
+) -> None:
+    lines = LOG.read_text(encoding="utf-8-sig").splitlines()
+    duplicate = next(line for line in lines if line.startswith("FAILED "))
+    terminal_index = next(
+        index
+        for index, line in enumerate(lines)
+        if VERIFIER._SUMMARY_RE.fullmatch(line) is not None
+    )
+    lines.insert(terminal_index, duplicate)
+    terminal_index += 1
+    terminal = lines[terminal_index]
+    assert terminal.startswith("78 failed, ")
+    if terminal_failed_count == 79:
+        lines[terminal_index] = "79 failed, " + terminal.removeprefix("78 failed, ")
+    log = tmp_path / "duplicate-outcome.log"
+    log.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    with pytest.raises(
+        VERIFIER.PublicCheckoutFailureSetError,
+        match="exact pytest failure outcome set drifted",
+    ) as captured:
+        VERIFIER.verify_expected_failure_set(REGISTRY, JUNIT, log)
+    assert "missing=[]" in str(captured.value)
+    assert f"unexpected={[duplicate]!r}" in str(captured.value)
+
+
 @pytest.mark.parametrize("node_id", FROZEN_V8_NODES)
 def test_interpreter_marker_is_accepted_for_every_exact_frozen_node(
     tmp_path: Path,
@@ -135,18 +210,69 @@ def test_arbitrary_or_substring_marker_is_rejected_for_every_frozen_node(
 
 
 def test_allowed_marker_does_not_relax_runtime_error_signature(tmp_path: Path) -> None:
+    node_id = FROZEN_V8_NODES[0]
     junit = _replace_failure_marker(
         tmp_path,
-        node_id=FROZEN_V8_NODES[0],
+        node_id=node_id,
         marker=INTERPRETER_MARKER,
         exception_type="ValueError",
     )
+    payload = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    expected = next(
+        item
+        for item in payload["expected_junit_failure_signatures"]
+        if item["node_id"] == node_id
+    )
+    unexpected = {**expected, "exception_types": ["ValueError"]}
 
     with pytest.raises(
         VERIFIER.PublicCheckoutFailureSetError,
         match="exact JUnit failure exception/category signatures drifted",
-    ):
+    ) as captured:
         VERIFIER.verify_expected_failure_set(REGISTRY, junit, LOG)
+    assert f"missing={[expected]!r}" in str(captured.value)
+    assert f"unexpected={[unexpected]!r}" in str(captured.value)
+
+
+def test_junit_signature_multiplicity_is_reported_before_count_drift(
+    tmp_path: Path,
+) -> None:
+    payload = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    expected = next(
+        item
+        for item in payload["expected_junit_failure_signatures"]
+        if item["category"] == "HELD_OR_RIGHTS_SENSITIVE_DEPENDENCY"
+        and item["failure_child_count"] == 1
+    )
+    tree = ET.parse(JUNIT)
+    suite = next(tree.getroot().iter("testsuite"))
+    testcase = next(
+        case
+        for case in suite.iter("testcase")
+        if VERIFIER._pytest_node_id(case) == expected["node_id"]
+    )
+    extra = ET.SubElement(
+        testcase,
+        "failure",
+        {"message": "ValueError: second failure child"},
+    )
+    extra.text = "ValueError: second failure child"
+    suite.attrib["failures"] = str(int(suite.attrib["failures"]) + 1)
+    junit = tmp_path / "signature-multiplicity.junit.xml"
+    tree.write(junit, encoding="utf-8", xml_declaration=True)
+    unexpected = {
+        **expected,
+        "exception_types": sorted([*expected["exception_types"], "ValueError"]),
+        "failure_child_count": 2,
+    }
+
+    with pytest.raises(
+        VERIFIER.PublicCheckoutFailureSetError,
+        match="exact JUnit failure exception/category signatures drifted",
+    ) as captured:
+        VERIFIER.verify_expected_failure_set(REGISTRY, junit, LOG)
+    assert f"missing={[expected]!r}" in str(captured.value)
+    assert f"unexpected={[unexpected]!r}" in str(captured.value)
 
 
 def test_frozen_contract_keeps_exact_seven_runtime_error_signatures() -> None:

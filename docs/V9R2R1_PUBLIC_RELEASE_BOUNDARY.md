@@ -72,6 +72,14 @@ offline-auditable evidence index rather than a cryptographic GitHub
 attestation. That limitation is represented as `false`, not silently promoted
 to an authenticated provenance claim.
 
+The opt-in public live job materializes the two observed Anaconda interpreter
+paths used by the frozen test semantics and checks their executable bytes,
+versions, prefixes, and build identities before running pytest. This repairs
+the runner-path mismatch only. The bootstrap runner image, conda repodata,
+transitive package archives, operating-system image, and native ABI closure
+are still not completely artifact-hashed, so
+`environment_lock_requirement_satisfied` remains `false`.
+
 ## Independent-reproduction boundary
 
 The standard-library-only utilities can independently recompute selected

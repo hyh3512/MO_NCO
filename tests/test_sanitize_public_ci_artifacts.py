@@ -436,6 +436,85 @@ def test_historical_interpreter_in_paired_pytest_evidence_preserves_contract(
 
 
 @pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (
+            f"FileNotFoundError: missing '{HISTORICAL_INTERPRETER}'\n",
+            "FileNotFoundError: missing '__HISTORICAL_INTERPRETER__'\n",
+        ),
+        (
+            "where is_file = WindowsPath('"
+            + HISTORICAL_INTERPRETER.replace("\\", "/")
+            + "').is_file\n",
+            "where is_file = WindowsPath('__HISTORICAL_INTERPRETER__').is_file\n",
+        ),
+        (
+            f"args=('{HISTORICAL_INTERPRETER}', '--preflight-only')\n",
+            "args=('__HISTORICAL_INTERPRETER__', '--preflight-only')\n",
+        ),
+        (
+            "args=['"
+            + HISTORICAL_INTERPRETER.replace("\\", "\\\\")
+            + "', '--preflight-only']\n",
+            "args=['__HISTORICAL_INTERPRETER__', '--preflight-only']\n",
+        ),
+    ],
+    ids=[
+        "file-not-found-repr",
+        "windows-path-repr",
+        "tuple-repr",
+        "double-escaped-list-repr",
+    ],
+)
+def test_historical_interpreter_in_matched_single_quote_repr_is_sanitized(
+    tmp_path: Path,
+    raw: str,
+    expected: str,
+) -> None:
+    receipt, outputs, receipt_path = _create_bundle(
+        tmp_path,
+        {"runtime.txt": raw.encode("ascii")},
+    )
+
+    assert outputs["runtime.txt"].read_bytes() == expected.encode("ascii")
+    assert receipt["replacement_contract"]["rules"][0]["match_counts"] == {
+        "runtime.txt": 1
+    }
+    assert _verify_bundle(
+        receipt_path=receipt_path,
+        outputs=outputs,
+    ) == receipt
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        f"path='{HISTORICAL_INTERPRETER}'.bak\n",
+        f"path='{HISTORICAL_INTERPRETER}'\\child\n",
+        f"path='{HISTORICAL_INTERPRETER}':alternate-stream\n",
+        f"path=prefix'{HISTORICAL_INTERPRETER}'\n",
+        f"path='{HISTORICAL_INTERPRETER}'suffix\n",
+    ],
+    ids=[
+        "quoted-extension",
+        "quoted-child",
+        "quoted-ads",
+        "prefix-before-opening-quote",
+        "suffix-after-closing-quote",
+    ],
+)
+def test_matched_single_quotes_do_not_relax_path_concatenation_rejection(
+    tmp_path: Path,
+    raw: str,
+) -> None:
+    with pytest.raises(ValueError, match="Windows|absolute path|sensitive"):
+        _create_bundle(
+            tmp_path,
+            {"runtime.txt": raw.encode("ascii")},
+        )
+
+
+@pytest.mark.parametrize(
     ("prefix", "suffix"),
     [
         ("", ".bak"),

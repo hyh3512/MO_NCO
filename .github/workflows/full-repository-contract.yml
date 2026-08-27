@@ -109,16 +109,74 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13.12"
-          cache: pip
-          cache-dependency-path: requirements/optional-pymoo.lock
+      - name: Materialize observed Anaconda interpreter identities
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $bootstrapConda = 'C:\Miniconda\Scripts\conda.exe'
+          $basePrefix = 'C:\miniconda3'
+          $basePython = 'C:\miniconda3\python.exe'
+          $ssmPrefix = 'C:\miniconda3\envs\ssm_env'
+          $ssmPython = 'C:\miniconda3\envs\ssm_env\python.exe'
+          if (-not (Test-Path -LiteralPath $bootstrapConda -PathType Leaf)) {
+            throw 'GitHub runner bootstrap conda is unavailable at its declared image path'
+          }
+          if (Test-Path -LiteralPath $basePrefix) {
+            throw 'exact live interpreter prefix unexpectedly pre-exists'
+          }
+          & $bootstrapConda create --yes --quiet `
+            --prefix $basePrefix `
+            --override-channels `
+            --channel 'https://repo.anaconda.com/pkgs/main' `
+            'python=3.13.12=h39c999c_100_cp313'
+          if ($LASTEXITCODE -ne 0) { throw 'exact Anaconda CPython 3.13.12 materialization failed' }
+          & $bootstrapConda create --yes --quiet `
+            --prefix $ssmPrefix `
+            --override-channels `
+            --channel 'https://repo.anaconda.com/pkgs/main' `
+            'python=3.11.15=h1044e36_0'
+          if ($LASTEXITCODE -ne 0) { throw 'nonhistorical ssm_env path materialization failed' }
+          if ((Get-FileHash -Algorithm SHA256 -LiteralPath $basePython).Hash.ToLowerInvariant() -ne 'f77193cf0405ab440c39324bdb2f8864596321c1df888adbbe357f3d760f4716') {
+            throw 'exact Anaconda CPython 3.13.12 executable hash drifted'
+          }
+          if ((Get-Item -LiteralPath $basePython).Length -ne 105288) {
+            throw 'exact Anaconda CPython 3.13.12 executable size drifted'
+          }
+          if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ssmPython).Hash.ToLowerInvariant() -ne '418228fb1417da15512fc44aba6f2e1d948786878ffd06fd661881c6d104c0f6') {
+            throw 'exact Anaconda CPython 3.11.15 executable hash drifted'
+          }
+          if ((Get-Item -LiteralPath $ssmPython).Length -ne 105288) {
+            throw 'exact Anaconda CPython 3.11.15 executable size drifted'
+          }
+          $baseIdentity = (& $basePython -c "import json,sys; print(json.dumps({'executable':sys.executable,'prefix':sys.prefix,'base_prefix':sys.base_prefix,'version':sys.version},sort_keys=True))") | ConvertFrom-Json
+          if (
+            $baseIdentity.executable -ne $basePython -or
+            $baseIdentity.prefix -ne $basePrefix -or
+            $baseIdentity.base_prefix -ne $basePrefix -or
+            $baseIdentity.version -ne '3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:05:56) [MSC v.1942 64 bit (AMD64)]'
+          ) {
+            throw 'exact Anaconda CPython 3.13.12 runtime identity drifted'
+          }
+          $ssmIdentity = (& $ssmPython -c "import json,sys; print(json.dumps({'executable':sys.executable,'prefix':sys.prefix,'base_prefix':sys.base_prefix,'version':sys.version},sort_keys=True))") | ConvertFrom-Json
+          if (
+            $ssmIdentity.executable -ne $ssmPython -or
+            $ssmIdentity.prefix -ne $ssmPrefix -or
+            $ssmIdentity.base_prefix -ne $ssmPrefix -or
+            $ssmIdentity.version -ne '3.11.15 | packaged by Anaconda, Inc. | (main, Mar 11 2026, 17:12:15) [MSC v.1942 64 bit (AMD64)]'
+          ) {
+            throw 'exact Anaconda CPython 3.11.15 runtime identity drifted'
+          }
+          $basePrefix | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          (Join-Path $basePrefix 'Scripts') | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          'V9R2R1_LIVE_PYTHON=C:\miniconda3\python.exe' | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Warning 'Exact observed interpreter identities are materialized for frozen test semantics; the artifact-hashed environment lock remains false.'
 
       - name: Verify live checkout source and test closure
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $activePython = (Get-Command python).Source
+          if ($activePython -ne $env:V9R2R1_LIVE_PYTHON) { throw "unexpected active live interpreter: $activePython" }
           python scripts/verify_v9r2r1_current_source.py `
             --root . `
             --manifest V21E3R1_V9R2R1_SOURCE_MANIFEST.json `
@@ -218,10 +276,12 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $false
           $env:TEMP = $env:RUNNER_TEMP
           $env:TMP = $env:RUNNER_TEMP
+          $baseTemp = Join-Path $env:RUNNER_TEMP 'pytest-basetemp'
+          if (Test-Path -LiteralPath $baseTemp) { throw 'pytest base temp unexpectedly pre-exists' }
           $junit = Join-Path $env:RUNNER_TEMP 'public-checkout-live.junit.xml'
           $log = Join-Path $env:RUNNER_TEMP 'public-checkout-live.log'
           $receipt = Join-Path $env:RUNNER_TEMP 'public-checkout-live-contract.raw-local-only.json'
-          python -m pytest -q -p no:cacheprovider --tb=short --color=no --junitxml=$junit *> $log
+          python -m pytest -q -p no:cacheprovider --tb=short --color=no --basetemp=$baseTemp --junitxml=$junit *> $log
           $pytestExit = $LASTEXITCODE
           if ($pytestExit -ne 1) { throw "expected pytest exit 1 before contract verification, got $pytestExit" }
           python scripts/verify_expected_public_checkout_failure_set.py `

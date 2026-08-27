@@ -14,6 +14,7 @@ confirmation, formal study, scientific claims, or submission.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import hashlib
 import json
 import os
@@ -107,6 +108,16 @@ def _canonical_json(value: object) -> bytes:
         ensure_ascii=False,
         allow_nan=False,
     ).encode("utf-8")
+
+
+def _string_multiset_delta(
+    expected: Sequence[str], observed: Sequence[str]
+) -> tuple[list[str], list[str]]:
+    expected_counts = Counter(expected)
+    observed_counts = Counter(observed)
+    missing = sorted((expected_counts - observed_counts).elements())
+    unexpected = sorted((observed_counts - expected_counts).elements())
+    return missing, unexpected
 
 
 def _sha256(raw: bytes) -> str:
@@ -623,8 +634,6 @@ def _log_observation(raw: bytes) -> dict[str, object]:
         for line in lines
         if line.startswith("FAILED ") or _SUBFAILED_RE.fullmatch(line) is not None
     )
-    if len(summary_lines) != len(set(summary_lines)):
-        raise PublicCheckoutFailureSetError("duplicate pytest failed summary outcome")
     terminal_matches = [
         match
         for line in lines
@@ -645,10 +654,6 @@ def _log_observation(raw: bytes) -> dict[str, object]:
         ),
         "subtests_passed": int(match.group("subtests")),
     }
-    if counts["failed_or_subfailed_outcomes"] != len(summary_lines):
-        raise PublicCheckoutFailureSetError(
-            "pytest terminal failed count and summary outcomes disagree"
-        )
     return {
         "counts": counts,
         "duration_text": match.group("duration"),
@@ -689,6 +694,43 @@ def verify_expected_failure_set(
     observed_junit_counts = junit["counts"]
     observed_junit_declared = junit["declared_counts"]
     observed_log_counts = log["counts"]
+
+    if junit["node_ids"] != registry["expected_junit_failure_or_error_node_ids"]:
+        missing = sorted(
+            set(registry["expected_junit_failure_or_error_node_ids"])
+            - set(junit["node_ids"])
+        )
+        unexpected = sorted(
+            set(junit["node_ids"])
+            - set(registry["expected_junit_failure_or_error_node_ids"])
+        )
+        raise PublicCheckoutFailureSetError(
+            f"exact JUnit failure node-id set drifted; missing={missing!r}; "
+            f"unexpected={unexpected!r}"
+        )
+    if junit["signatures"] != registry["expected_junit_failure_signatures"]:
+        expected_signatures = registry["expected_junit_failure_signatures"]
+        missing = [
+            item for item in expected_signatures if item not in junit["signatures"]
+        ]
+        unexpected = [
+            item for item in junit["signatures"] if item not in expected_signatures
+        ]
+        raise PublicCheckoutFailureSetError(
+            "exact JUnit failure exception/category signatures drifted; "
+            f"missing={missing!r}; unexpected={unexpected!r}"
+        )
+    expected_summary_lines = [
+        item["summary_line"] for item in registry["expected_pytest_outcomes"]
+    ]
+    if log["summary_lines"] != expected_summary_lines:
+        missing, unexpected = _string_multiset_delta(
+            expected_summary_lines, log["summary_lines"]
+        )
+        raise PublicCheckoutFailureSetError(
+            f"exact pytest failure outcome set drifted; missing={missing!r}; "
+            f"unexpected={unexpected!r}"
+        )
 
     exact_junit_fields = {
         "error_testcases": "junit_error_testcases",
@@ -748,34 +790,6 @@ def verify_expected_failure_set(
             raise PublicCheckoutFailureSetError(
                 "live passed/testcase count regressed below reference"
             )
-
-    if junit["node_ids"] != registry["expected_junit_failure_or_error_node_ids"]:
-        missing = sorted(
-            set(registry["expected_junit_failure_or_error_node_ids"])
-            - set(junit["node_ids"])
-        )
-        unexpected = sorted(
-            set(junit["node_ids"])
-            - set(registry["expected_junit_failure_or_error_node_ids"])
-        )
-        raise PublicCheckoutFailureSetError(
-            f"exact JUnit failure node-id set drifted; missing={missing!r}; "
-            f"unexpected={unexpected!r}"
-        )
-    if junit["signatures"] != registry["expected_junit_failure_signatures"]:
-        raise PublicCheckoutFailureSetError(
-            "exact JUnit failure exception/category signatures drifted"
-        )
-    expected_summary_lines = [
-        item["summary_line"] for item in registry["expected_pytest_outcomes"]
-    ]
-    if log["summary_lines"] != expected_summary_lines:
-        missing = sorted(set(expected_summary_lines) - set(log["summary_lines"]))
-        unexpected = sorted(set(log["summary_lines"]) - set(expected_summary_lines))
-        raise PublicCheckoutFailureSetError(
-            f"exact pytest failure outcome set drifted; missing={missing!r}; "
-            f"unexpected={unexpected!r}"
-        )
 
     core: dict[str, object] = {
         "authorization_boundaries": registry["authorization_boundaries"],

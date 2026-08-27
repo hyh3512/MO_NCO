@@ -97,6 +97,12 @@ _HISTORICAL_INTERPRETER_LEFT_DELIMITER = (
 _HISTORICAL_INTERPRETER_RIGHT_DELIMITER = (
     rb"(?=\Z|[\x09\x0a\x0d\"<]|;[ ]observed[ ])"
 )
+_HISTORICAL_INTERPRETER_SINGLE_QUOTE_LEFT_CONTEXT = (
+    rb"(?P<leading>\A|[\x09\x0a\x0d =(\[,])'"
+)
+_HISTORICAL_INTERPRETER_SINGLE_QUOTE_RIGHT_CONTEXT = (
+    rb"'(?=\Z|[\x09\x0a\x0d\"<),\]}])"
+)
 _HISTORICAL_INTERPRETER_PATH_SHAPE = re.compile(
     rb"C:[\\/]+miniconda3[\\/]+envs[\\/]+ssm_env[\\/]+python[.]exe",
     re.IGNORECASE,
@@ -531,13 +537,27 @@ def _replace_historical_interpreter(raw: bytes) -> tuple[bytes, int]:
     total = 0
     replacement = HISTORICAL_INTERPRETER_REPLACEMENT.encode("ascii")
     for variant in _HISTORICAL_INTERPRETER_VARIANTS:
-        pattern = re.compile(
+        unquoted_pattern = re.compile(
             _HISTORICAL_INTERPRETER_LEFT_DELIMITER
             + re.escape(variant)
             + _HISTORICAL_INTERPRETER_RIGHT_DELIMITER,
             re.IGNORECASE,
         )
-        result, count = pattern.subn(lambda _match: replacement, result)
+        result, count = unquoted_pattern.subn(lambda _match: replacement, result)
+        total += count
+        single_quoted_pattern = re.compile(
+            _HISTORICAL_INTERPRETER_SINGLE_QUOTE_LEFT_CONTEXT
+            + re.escape(variant)
+            + _HISTORICAL_INTERPRETER_SINGLE_QUOTE_RIGHT_CONTEXT,
+            re.IGNORECASE,
+        )
+        result, count = single_quoted_pattern.subn(
+            lambda match: match.group("leading")
+            + b"'"
+            + replacement
+            + b"'",
+            result,
+        )
         total += count
     if _HISTORICAL_INTERPRETER_PATH_SHAPE.search(result) is not None:
         raise CIArtifactSanitizationError(
