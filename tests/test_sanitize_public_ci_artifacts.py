@@ -502,9 +502,18 @@ def test_historical_interpreter_rule_rejects_path_concatenations(
 @pytest.mark.parametrize(
     "mixed_path",
     [
-        r"C:\\miniconda3\envs\\ssm_env\python.exe",
-        r"C:/miniconda3\envs/ssm_env\\python.exe",
-        r"C:\\\miniconda3\\\envs\\\ssm_env\\\python.exe",
+        pytest.param(
+            r"C:\\miniconda3\envs\\ssm_env\python.exe",
+            id="mixed-one-two-one",
+        ),
+        pytest.param(
+            r"C:/miniconda3\envs/ssm_env\\python.exe",
+            id="mixed-forward-one-two",
+        ),
+        pytest.param(
+            r"C:\\\miniconda3\\\envs\\\ssm_env\\\python.exe",
+            id="unsupported-depth-three",
+        ),
     ],
 )
 def test_historical_interpreter_rule_rejects_mixed_or_unsupported_slash_depths(
