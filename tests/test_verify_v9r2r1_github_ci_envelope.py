@@ -939,6 +939,169 @@ def test_green_junit_and_log_counts_are_independently_derived() -> None:
         VERIFIER._junit_green_metrics(junit, b"3 passed in 0.01s\n")
 
 
+def test_live_output_uses_generic_sanitizer_contract(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    receipt = tmp_path / "V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json"
+    junit = tmp_path / "full_repository.sanitized.junit.xml"
+    log = tmp_path / "full_repository.sanitized.log"
+    generic_source = tmp_path / "sanitize_public_ci_artifacts.py"
+    engine_source = tmp_path / "sanitize_public_checkout_outputs.py"
+    observed: dict[str, object] = {}
+
+    def fake_verify(**kwargs: object) -> dict[str, object]:
+        observed.update(kwargs)
+        return {"verified": True}
+
+    monkeypatch.setattr(VERIFIER, "_verify_generic_sanitization_bundle", fake_verify)
+    module = object()
+    result = VERIFIER._verify_live_output_sanitization_bundle(
+        module=module,
+        member_paths={
+            receipt.name: receipt,
+            junit.name: junit,
+            log.name: log,
+        },
+        subject_commit_sha1="1" * 40,
+        subject_tree_sha1="2" * 40,
+        generic_source_path=generic_source,
+        engine_source_path=engine_source,
+    )
+    assert result == {"verified": True}
+    assert observed == {
+        "module": module,
+        "receipt_path": receipt,
+        "outputs": {
+            "full_repository.junit.xml": junit,
+            "full_repository.log": log,
+        },
+        "kinds": {
+            "full_repository.junit.xml": "PYTEST_JUNIT_XML",
+            "full_repository.log": "PYTEST_LOG",
+        },
+        "subject_commit_sha1": "1" * 40,
+        "subject_tree_sha1": "2" * 40,
+        "generic_source_path": generic_source,
+        "engine_source_path": engine_source,
+    }
+
+
+def test_historical_interpreter_rule_is_fixed() -> None:
+    valid = type(
+        "ValidGenericSanitizer",
+        (),
+        {
+            "RULE_IDS": (
+                "historical_interpreter",
+                "repository_root",
+                "temp_root",
+                "user_home",
+                "environment_prefix",
+                "username",
+                "host_name",
+            ),
+            "HISTORICAL_INTERPRETER": (
+                r"C:\miniconda3\envs\ssm_env\python.exe"
+            ),
+            "HISTORICAL_INTERPRETER_REPLACEMENT": (
+                "__HISTORICAL_INTERPRETER__"
+            ),
+            "REPLACEMENTS": {
+                "historical_interpreter": "__HISTORICAL_INTERPRETER__",
+                "repository_root": "__REPO_ROOT__",
+                "temp_root": "__TEMP_ROOT__",
+                "user_home": "__USER_HOME__",
+                "environment_prefix": "__PYTHON_PREFIX__",
+                "username": "__USERNAME__",
+                "host_name": "__HOSTNAME__",
+            },
+        },
+    )()
+    VERIFIER._require_historical_interpreter_rule(valid)
+
+    for rule_ids, replacements in (
+        (
+            ("repository_root", "historical_interpreter"),
+            {
+                "historical_interpreter": "__HISTORICAL_INTERPRETER__",
+                "repository_root": "__REPO_ROOT__",
+            },
+        ),
+        (
+            (
+                "historical_interpreter",
+                "repository_root",
+                "temp_root",
+                "user_home",
+                "environment_prefix",
+                "username",
+                "host_name",
+            ),
+            {
+                "historical_interpreter": "__WRONG__",
+                "repository_root": "__REPO_ROOT__",
+                "temp_root": "__TEMP_ROOT__",
+                "user_home": "__USER_HOME__",
+                "environment_prefix": "__PYTHON_PREFIX__",
+                "username": "__USERNAME__",
+                "host_name": "__HOSTNAME__",
+            },
+        ),
+    ):
+        invalid = type(
+            "InvalidGenericSanitizer",
+            (),
+            {
+                "RULE_IDS": rule_ids,
+                "HISTORICAL_INTERPRETER": (
+                    r"C:\miniconda3\envs\ssm_env\python.exe"
+                ),
+                "HISTORICAL_INTERPRETER_REPLACEMENT": (
+                    "__HISTORICAL_INTERPRETER__"
+                ),
+                "REPLACEMENTS": replacements,
+            },
+        )()
+        with pytest.raises(
+            VERIFIER.GitHubCIEnvelopeVerificationError,
+            match="historical-interpreter rule drifted",
+        ):
+            VERIFIER._require_historical_interpreter_rule(invalid)
+
+
+def test_historical_interpreter_receipt_counts_are_bound_to_output_bytes(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "run.log"
+    output.write_bytes(
+        b"runtime=__HISTORICAL_INTERPRETER__\n"
+        b"runtime=__HISTORICAL_INTERPRETER__\n"
+    )
+    receipt = {
+        "replacement_contract": {
+            "replacement_order": ["historical_interpreter"],
+            "rules": [
+                {
+                    "id": "historical_interpreter",
+                    "replacement": "__HISTORICAL_INTERPRETER__",
+                    "match_counts": {"run.log": 2},
+                }
+            ],
+        }
+    }
+    VERIFIER._require_historical_interpreter_receipt(
+        receipt, outputs={"run.log": output}
+    )
+    receipt["replacement_contract"]["rules"][0]["match_counts"]["run.log"] = 1
+    with pytest.raises(
+        VERIFIER.GitHubCIEnvelopeVerificationError,
+        match="output/count binding drifted",
+    ):
+        VERIFIER._require_historical_interpreter_receipt(
+            receipt, outputs={"run.log": output}
+        )
+
+
 def test_installed_gate_semantics_cannot_be_fabricated() -> None:
     raw = subprocess.run(
         ["git", "show", f"{SUBJECT_COMMIT_SHA1}:evidence/gate/installed_gate_receipt.json"],

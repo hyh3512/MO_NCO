@@ -14,16 +14,8 @@ SCRIPT = ROOT / "scripts" / "verify_expected_public_checkout_failure_set.py"
 REGISTRY = ROOT / "provenance" / "V9R2R1_EXPECTED_PUBLIC_CHECKOUT_FAILURE_SET.json"
 JUNIT = ROOT / "evidence" / "public_checkout" / "full_repository.sanitized.junit.xml"
 LOG = ROOT / "evidence" / "public_checkout" / "full_repository.sanitized.log"
-PORTABLE_INTERPRETER_NODE = (
-    "tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::"
-    "test_real_incident_preflight_is_read_only_and_requires_fresh_exact17"
-)
 INTERPRETER_MARKER = "Helper must use the exact historical main-job interpreter"
 MANIFEST_MARKER = "Frozen diagnostic source manifest drifted"
-OTHER_FROZEN_NODE = (
-    "tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::"
-    "test_external_scheduling_missing_bound_file_is_fail_closed"
-)
 
 
 def _load_module():
@@ -35,6 +27,7 @@ def _load_module():
 
 
 VERIFIER = _load_module()
+FROZEN_V8_NODES = tuple(sorted(VERIFIER.FROZEN_V8_NODE_IDS))
 
 
 def _replace_failure_marker(
@@ -61,12 +54,14 @@ def _replace_failure_marker(
     return output
 
 
-def test_portable_interpreter_marker_is_accepted_only_for_its_exact_node(
+@pytest.mark.parametrize("node_id", FROZEN_V8_NODES)
+def test_interpreter_marker_is_accepted_for_every_exact_frozen_node(
     tmp_path: Path,
+    node_id: str,
 ) -> None:
     junit = _replace_failure_marker(
         tmp_path,
-        node_id=PORTABLE_INTERPRETER_NODE,
+        node_id=node_id,
         marker=(
             f"{INTERPRETER_MARKER} C:\\hostedtoolcache\\Python\\3.13.12\\python.exe; "
             "observed D:\\a\\MO_NCO\\python.exe"
@@ -79,13 +74,13 @@ def test_portable_interpreter_marker_is_accepted_only_for_its_exact_node(
     signature = next(
         item
         for item in receipt["exact_junit_failure_signatures"]
-        if item["node_id"] == PORTABLE_INTERPRETER_NODE
+        if item["node_id"] == node_id
     )
     assert signature == {
         "category": "FROZEN_V8_FAIL_CLOSED",
         "exception_types": ["RuntimeError"],
         "failure_child_count": 1,
-        "node_id": PORTABLE_INTERPRETER_NODE,
+        "node_id": node_id,
     }
 
 
@@ -109,37 +104,26 @@ def test_checked_in_manifest_marker_reference_remains_exact() -> None:
     assert len(receipt["exact_pytest_failure_summary_lines"]) == 78
 
 
-def test_interpreter_marker_is_rejected_for_every_other_frozen_node(
-    tmp_path: Path,
-) -> None:
-    junit = _replace_failure_marker(
-        tmp_path,
-        node_id=OTHER_FROZEN_NODE,
-        marker=INTERPRETER_MARKER,
-    )
-
-    with pytest.raises(
-        VERIFIER.PublicCheckoutFailureSetError,
-        match="frozen-V8 failure marker drifted",
-    ):
-        VERIFIER.verify_expected_failure_set(REGISTRY, junit, LOG)
-
-
 @pytest.mark.parametrize(
     "marker",
     [
         "Helper may use the exact historical main-job interpreter",
         f"{INTERPRETER_MARKER}-suffix-without-marker-boundary",
+        f"prefix {INTERPRETER_MARKER}",
+        f"{MANIFEST_MARKER}-suffix-without-marker-boundary",
+        f"prefix {MANIFEST_MARKER}",
         "unregistered fail-closed marker",
     ],
 )
-def test_unregistered_marker_is_rejected_for_portable_interpreter_node(
+@pytest.mark.parametrize("node_id", FROZEN_V8_NODES)
+def test_arbitrary_or_substring_marker_is_rejected_for_every_frozen_node(
     tmp_path: Path,
+    node_id: str,
     marker: str,
 ) -> None:
     junit = _replace_failure_marker(
         tmp_path,
-        node_id=PORTABLE_INTERPRETER_NODE,
+        node_id=node_id,
         marker=marker,
     )
 
@@ -153,7 +137,7 @@ def test_unregistered_marker_is_rejected_for_portable_interpreter_node(
 def test_allowed_marker_does_not_relax_runtime_error_signature(tmp_path: Path) -> None:
     junit = _replace_failure_marker(
         tmp_path,
-        node_id=PORTABLE_INTERPRETER_NODE,
+        node_id=FROZEN_V8_NODES[0],
         marker=INTERPRETER_MARKER,
         exception_type="ValueError",
     )
@@ -165,11 +149,29 @@ def test_allowed_marker_does_not_relax_runtime_error_signature(tmp_path: Path) -
         VERIFIER.verify_expected_failure_set(REGISTRY, junit, LOG)
 
 
+def test_frozen_contract_keeps_exact_seven_runtime_error_signatures() -> None:
+    payload = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    frozen_signatures = {
+        item["node_id"]: item
+        for item in payload["expected_junit_failure_signatures"]
+        if item["category"] == "FROZEN_V8_FAIL_CLOSED"
+    }
+
+    assert len(FROZEN_V8_NODES) == 7
+    assert set(frozen_signatures) == set(FROZEN_V8_NODES)
+    assert {
+        tuple(item["exception_types"]) for item in frozen_signatures.values()
+    } == {("RuntimeError",)}
+    assert {
+        item["failure_child_count"] for item in frozen_signatures.values()
+    } == {1}
+
+
 def test_resealed_registry_cannot_expand_the_marker_allowlist(tmp_path: Path) -> None:
     payload = json.loads(REGISTRY.read_text(encoding="utf-8"))
-    payload["frozen_v8_failure_marker_contract"]["node_overrides"][
-        PORTABLE_INTERPRETER_NODE
-    ].append("unregistered fail-closed marker")
+    payload["frozen_v8_failure_marker_contract"]["default_allowed_markers"].append(
+        "unregistered fail-closed marker"
+    )
     core = dict(payload)
     del core["manifest_payload_sha256"]
     payload["manifest_payload_sha256"] = hashlib.sha256(

@@ -250,11 +250,13 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'could not resolve live checkout tree' }
           $pythonPrefix = (python -c "import sys; print(sys.prefix)").Trim()
           if ($LASTEXITCODE -ne 0) { throw 'could not resolve live Python prefix' }
-          python scripts/sanitize_public_checkout_outputs.py create `
-            --raw-junit $rawJunit `
-            --raw-log $rawLog `
-            --output-junit $safeJunit `
-            --output-log $safeLog `
+          python scripts/sanitize_public_ci_artifacts.py create `
+            --input "full_repository.junit.xml=$rawJunit" `
+            --input "full_repository.log=$rawLog" `
+            --output "full_repository.junit.xml=$safeJunit" `
+            --output "full_repository.log=$safeLog" `
+            --kind "full_repository.junit.xml=PYTEST_JUNIT_XML" `
+            --kind "full_repository.log=PYTEST_LOG" `
             --receipt $sanitizationReceipt `
             --repository-root $env:GITHUB_WORKSPACE `
             --user-home $env:USERPROFILE `
@@ -264,10 +266,15 @@ jobs:
             --reference-commit $referenceCommit `
             --reference-tree $referenceTree
           if ($LASTEXITCODE -ne 0) { throw 'live public-checkout evidence sanitization failed' }
-          python scripts/sanitize_public_checkout_outputs.py verify `
+          python scripts/sanitize_public_ci_artifacts.py verify `
+            --output "full_repository.junit.xml=$safeJunit" `
+            --output "full_repository.log=$safeLog" `
+            --kind "full_repository.junit.xml=PYTEST_JUNIT_XML" `
+            --kind "full_repository.log=PYTEST_LOG" `
             --receipt $sanitizationReceipt `
-            --junit $safeJunit `
-            --log $safeLog
+            --repository-root $env:GITHUB_WORKSPACE `
+            --user-home $env:USERPROFILE `
+            --host-name $env:COMPUTERNAME
           if ($LASTEXITCODE -ne 0) { throw 'sanitized live evidence verification failed' }
           python scripts/verify_expected_public_checkout_failure_set.py `
             --registry provenance/V9R2R1_EXPECTED_PUBLIC_CHECKOUT_FAILURE_SET.json `

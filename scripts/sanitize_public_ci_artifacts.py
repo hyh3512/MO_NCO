@@ -24,7 +24,7 @@ from typing import Mapping, Sequence
 import xml.etree.ElementTree as ET
 
 
-RECEIPT_SCHEMA = "v21e3r1_v9r2r1_public_ci_artifact_sanitization_receipt_v1"
+RECEIPT_SCHEMA = "v21e3r1_v9r2r1_public_ci_artifact_sanitization_receipt_v2"
 PASS_STATUS = "PASS_GENERIC_PUBLIC_CI_ARTIFACT_SANITIZATION"
 IDENTITY = {
     "distribution": "mo-nco",
@@ -33,7 +33,10 @@ IDENTITY = {
 }
 GENERIC_SOURCE_LOGICAL_PATH = "scripts/sanitize_public_ci_artifacts.py"
 ENGINE_SOURCE_LOGICAL_PATH = "scripts/sanitize_public_checkout_outputs.py"
+HISTORICAL_INTERPRETER = r"C:\miniconda3\envs\ssm_env\python.exe"
+HISTORICAL_INTERPRETER_REPLACEMENT = "__HISTORICAL_INTERPRETER__"
 RULE_IDS = (
+    "historical_interpreter",
     "repository_root",
     "temp_root",
     "user_home",
@@ -42,6 +45,7 @@ RULE_IDS = (
     "host_name",
 )
 REPLACEMENTS = {
+    "historical_interpreter": HISTORICAL_INTERPRETER_REPLACEMENT,
     "repository_root": "__REPO_ROOT__",
     "temp_root": "__TEMP_ROOT__",
     "user_home": "__USER_HOME__",
@@ -76,6 +80,26 @@ _WINDOWS_VOLUME_DEVICE_RE = re.compile(
 _WINDOWS_ROOTED_PROFILE_RE = re.compile(
     rb"(?i)(?<![a-z0-9\\])\\+(?:Users|ProgramData|Windows|"
     rb"Documents[ ]and[ ]Settings)\\+"
+)
+_HISTORICAL_INTERPRETER_VARIANTS = tuple(
+    variant.encode("ascii")
+    for variant in dict.fromkeys(
+        [
+            HISTORICAL_INTERPRETER.replace("\\", "\\" * depth)
+            for depth in (4, 2, 1)
+        ]
+        + [HISTORICAL_INTERPRETER.replace("\\", "/")]
+    )
+)
+_HISTORICAL_INTERPRETER_LEFT_DELIMITER = (
+    rb"(?:\A|(?<=[\x09\x0a\x0d =\"]))"
+)
+_HISTORICAL_INTERPRETER_RIGHT_DELIMITER = (
+    rb"(?=\Z|[\x09\x0a\x0d\"<]|;[ ]observed[ ])"
+)
+_HISTORICAL_INTERPRETER_PATH_SHAPE = re.compile(
+    rb"C:[\\/]+miniconda3[\\/]+envs[\\/]+ssm_env[\\/]+python[.]exe",
+    re.IGNORECASE,
 )
 _PYTEST_TERMINAL_RE = re.compile(
     r"^(?P<body>(?:\d+ (?:failed|passed|skipped|xfailed|xpassed|warnings?|"
@@ -500,6 +524,29 @@ def _public_fixture_counts_and_residuals(
     return fixture_counts, drive_count + unc_or_device_count + decoded_count
 
 
+def _replace_historical_interpreter(raw: bytes) -> tuple[bytes, int]:
+    """Replace only the frozen historical interpreter path spellings."""
+
+    result = raw
+    total = 0
+    replacement = HISTORICAL_INTERPRETER_REPLACEMENT.encode("ascii")
+    for variant in _HISTORICAL_INTERPRETER_VARIANTS:
+        pattern = re.compile(
+            _HISTORICAL_INTERPRETER_LEFT_DELIMITER
+            + re.escape(variant)
+            + _HISTORICAL_INTERPRETER_RIGHT_DELIMITER,
+            re.IGNORECASE,
+        )
+        result, count = pattern.subn(lambda _match: replacement, result)
+        total += count
+    if _HISTORICAL_INTERPRETER_PATH_SHAPE.search(result) is not None:
+        raise CIArtifactSanitizationError(
+            "sensitive historical interpreter path occurs outside the exact "
+            "delimiter contract"
+        )
+    return result, total
+
+
 def _junit_observation(raw: bytes, engine: ModuleType) -> dict[str, object]:
     """Return the delegated projection after enforcing a strict generic shape."""
 
@@ -821,14 +868,21 @@ def create_ci_artifact_bundle(
             raise CIArtifactSanitizationError(
                 f"sanitization replacement token collides with raw input: {name}"
             )
-        sanitized, observed_replacements, observed_fixtures = engine._sanitize_one(
-            raw,
+        fixed_sensitive_paths, historical_interpreter_count = (
+            _replace_historical_interpreter(raw)
+        )
+        sanitized, engine_replacements, observed_fixtures = engine._sanitize_one(
+            fixed_sensitive_paths,
             repository_root=repository_root,
             temp_root=temp_root,
             user_home=user_home,
             environment_prefix=environment_prefix,
             host_name=host_name,
         )
+        observed_replacements = {
+            "historical_interpreter": historical_interpreter_count,
+            **engine_replacements,
+        }
         semantic_label = {
             "PYTEST_JUNIT_XML": "JUnit",
             "PYTEST_LOG": "pytest log",

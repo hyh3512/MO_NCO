@@ -1077,6 +1077,7 @@ def _verify_generic_sanitization_bundle(
     generic_source_path: Path,
     engine_source_path: Path,
 ) -> dict[str, object]:
+    _require_historical_interpreter_rule(module)
     # The existing verifier's only mutable-checkout operation is replaced by
     # the already verified subject commit/tree pair.  All verifier source bytes
     # themselves were materialized from that subject below.
@@ -1099,6 +1100,15 @@ def _verify_generic_sanitization_bundle(
         raise GitHubCIEnvelopeVerificationError(
             "generic sanitization bundle verification failed"
         ) from error
+    if (
+        receipt.get("schema")
+        != "v21e3r1_v9r2r1_public_ci_artifact_sanitization_receipt_v2"
+        or receipt.get("status") != "PASS_GENERIC_PUBLIC_CI_ARTIFACT_SANITIZATION"
+        or receipt.get("identity") != _IDENTITY
+    ):
+        raise GitHubCIEnvelopeVerificationError(
+            "generic sanitization receipt identity/status drifted"
+        )
     if receipt.get("reference_checkout") != {
         "commit_sha1": subject_commit_sha1,
         "git_tree_sha1": subject_tree_sha1,
@@ -1106,7 +1116,126 @@ def _verify_generic_sanitization_bundle(
         raise GitHubCIEnvelopeVerificationError(
             "generic sanitization receipt subject binding drifted"
         )
+    _require_historical_interpreter_receipt(receipt, outputs=outputs)
     return receipt
+
+
+def _require_historical_interpreter_rule(module: ModuleType) -> None:
+    """Require the generic sanitizer's fixed historical interpreter rule.
+
+    The rule is part of the public artifact contract, not merely an
+    implementation detail of the subject-provided verifier.  Check it here so
+    a subject module cannot silently omit or rename the redaction while still
+    accepting its own receipts.
+    """
+
+    expected_rule_ids = (
+        "historical_interpreter",
+        "repository_root",
+        "temp_root",
+        "user_home",
+        "environment_prefix",
+        "username",
+        "host_name",
+    )
+    expected_replacements = {
+        "historical_interpreter": "__HISTORICAL_INTERPRETER__",
+        "repository_root": "__REPO_ROOT__",
+        "temp_root": "__TEMP_ROOT__",
+        "user_home": "__USER_HOME__",
+        "environment_prefix": "__PYTHON_PREFIX__",
+        "username": "__USERNAME__",
+        "host_name": "__HOSTNAME__",
+    }
+    if (
+        getattr(module, "RULE_IDS", None) != expected_rule_ids
+        or getattr(module, "REPLACEMENTS", None) != expected_replacements
+        or getattr(module, "HISTORICAL_INTERPRETER", None)
+        != r"C:\miniconda3\envs\ssm_env\python.exe"
+        or getattr(module, "HISTORICAL_INTERPRETER_REPLACEMENT", None)
+        != "__HISTORICAL_INTERPRETER__"
+    ):
+        raise GitHubCIEnvelopeVerificationError(
+            "generic sanitizer historical-interpreter rule drifted"
+        )
+
+
+def _require_historical_interpreter_receipt(
+    receipt: Mapping[str, object], *, outputs: Mapping[str, Path]
+) -> None:
+    replacement = receipt.get("replacement_contract")
+    if type(replacement) is not dict:
+        raise GitHubCIEnvelopeVerificationError(
+            "generic sanitizer replacement contract is missing"
+        )
+    order = replacement.get("replacement_order")
+    rules = replacement.get("rules")
+    if (
+        type(order) is not list
+        or order.count("historical_interpreter") != 1
+        or type(rules) is not list
+        or len(rules) != len(order)
+    ):
+        raise GitHubCIEnvelopeVerificationError(
+            "historical-interpreter receipt rule set drifted"
+        )
+    index = order.index("historical_interpreter")
+    rule = rules[index]
+    if (
+        type(rule) is not dict
+        or set(rule) != {"id", "replacement", "match_counts"}
+        or rule.get("id") != "historical_interpreter"
+        or rule.get("replacement") != "__HISTORICAL_INTERPRETER__"
+    ):
+        raise GitHubCIEnvelopeVerificationError(
+            "historical-interpreter receipt rule drifted"
+        )
+    counts = rule.get("match_counts")
+    if (
+        type(counts) is not dict
+        or set(counts) != set(outputs)
+        or any(type(count) is not int or count < 0 for count in counts.values())
+    ):
+        raise GitHubCIEnvelopeVerificationError(
+            "historical-interpreter receipt counts drifted"
+        )
+    token = b"__HISTORICAL_INTERPRETER__"
+    for logical_name, output_path in outputs.items():
+        if output_path.read_bytes().count(token) != counts[logical_name]:
+            raise GitHubCIEnvelopeVerificationError(
+                "historical-interpreter output/count binding drifted"
+            )
+
+
+def _verify_live_output_sanitization_bundle(
+    *,
+    module: ModuleType,
+    member_paths: Mapping[str, Path],
+    subject_commit_sha1: str,
+    subject_tree_sha1: str,
+    generic_source_path: Path,
+    engine_source_path: Path,
+) -> dict[str, object]:
+    return _verify_generic_sanitization_bundle(
+        module=module,
+        receipt_path=member_paths["V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json"],
+        outputs={
+            "full_repository.junit.xml": member_paths[
+                "full_repository.sanitized.junit.xml"
+            ],
+            "full_repository.log": member_paths[
+                "full_repository.sanitized.log"
+            ],
+        },
+        kinds={
+            "full_repository.junit.xml": "PYTEST_JUNIT_XML",
+            "full_repository.log": "PYTEST_LOG",
+        },
+        subject_commit_sha1=subject_commit_sha1,
+        subject_tree_sha1=subject_tree_sha1,
+        generic_source_path=generic_source_path,
+        engine_source_path=engine_source_path,
+    )
 
 
 def _validate_environment_preflight(raw: bytes, *, label: str) -> None:
@@ -1410,9 +1539,6 @@ def _derive_and_validate_inner_evidence(
             "generic": _load_exact_module(
                 blob_paths["generic_sanitizer"], name="subject_generic_sanitizer"
             ),
-            "engine": _load_exact_module(
-                blob_paths["sanitization_engine"], name="subject_sanitization_engine"
-            ),
         }
         member_paths: dict[int, dict[str, Path]] = {}
         for artifact_id, contents in contents_by_id.items():
@@ -1612,26 +1738,14 @@ def _derive_and_validate_inner_evidence(
             raise GitHubCIEnvelopeVerificationError(
                 "live public contract receipt semantics/bytes drifted"
             )
-        try:
-            output_sanitization = modules["engine"].verify_sanitized_bundle(
-                receipt_path=live_paths[
-                    "V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json"
-                ],
-                junit_path=live_paths["full_repository.sanitized.junit.xml"],
-                log_path=live_paths["full_repository.sanitized.log"],
-                sanitizer_source_path=blob_paths["sanitization_engine"],
-            )
-        except Exception as error:
-            raise GitHubCIEnvelopeVerificationError(
-                "live output sanitization receipt verification failed"
-            ) from error
-        if output_sanitization.get("reference_checkout") != {
-            "commit_sha1": subject_commit_sha1,
-            "git_tree_sha1": subject_tree_sha1,
-        }:
-            raise GitHubCIEnvelopeVerificationError(
-                "live output sanitization subject binding drifted"
-            )
+        _verify_live_output_sanitization_bundle(
+            module=modules["generic"],
+            member_paths=live_paths,
+            subject_commit_sha1=subject_commit_sha1,
+            subject_tree_sha1=subject_tree_sha1,
+            generic_source_path=blob_paths["generic_sanitizer"],
+            engine_source_path=blob_paths["sanitization_engine"],
+        )
         live_metrics = {
             **_public_contract_metrics(live_receipt),
             "junit_passed_testcases": live_receipt["counts"]["junit"][

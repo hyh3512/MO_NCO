@@ -76,22 +76,16 @@ FROZEN_V8_NODE_IDS = frozenset(
         "test_real_incident_preflight_is_read_only_and_requires_fresh_exact17",
     }
 )
-PORTABLE_INTERPRETER_NODE_ID = (
-    "tests/test_v21e3r1_frozen_diagnostic_metric_timeout_recovery_continuation.py::"
-    "test_real_incident_preflight_is_read_only_and_requires_fresh_exact17"
-)
 FROZEN_MANIFEST_MARKER = "Frozen diagnostic source manifest drifted"
 HISTORICAL_INTERPRETER_MARKER = (
     "Helper must use the exact historical main-job interpreter"
 )
 EXPECTED_FROZEN_V8_FAILURE_MARKER_CONTRACT = {
-    "default_allowed_markers": [FROZEN_MANIFEST_MARKER],
-    "node_overrides": {
-        PORTABLE_INTERPRETER_NODE_ID: [
-            FROZEN_MANIFEST_MARKER,
-            HISTORICAL_INTERPRETER_MARKER,
-        ]
-    },
+    "default_allowed_markers": [
+        FROZEN_MANIFEST_MARKER,
+        HISTORICAL_INTERPRETER_MARKER,
+    ],
+    "node_overrides": {},
 }
 SEALED_NODE_IDS = frozenset(
     {

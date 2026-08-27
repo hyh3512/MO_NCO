@@ -14,6 +14,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 GENERIC_SCRIPT = ROOT / "scripts" / "sanitize_public_ci_artifacts.py"
 ENGINE_SCRIPT = ROOT / "scripts" / "sanitize_public_checkout_outputs.py"
+HISTORICAL_INTERPRETER = r"C:\miniconda3\envs\ssm_env\python.exe"
 
 
 def _git_value(*arguments: str) -> str:
@@ -129,6 +130,7 @@ def test_create_accepts_drive_absolute_windows_paths_with_forward_slashes(
         for rule in receipt["replacement_contract"]["rules"]
     }
     assert rules == {
+        "historical_interpreter": 0,
         "repository_root": 1,
         "temp_root": 1,
         "user_home": 1,
@@ -340,6 +342,209 @@ def test_generic_artifacts_reject_public_source_fixture_literals(
         _create_bundle(tmp_path, {"diagnostic.txt": b"path=C:/trace.sqlite3\n"})
 
 
+def test_historical_interpreter_variants_are_replaced_and_receipted(
+    tmp_path: Path,
+) -> None:
+    variants = [
+        HISTORICAL_INTERPRETER.replace("\\", "\\" * depth)
+        for depth in (4, 2, 1)
+    ]
+    variants.append(HISTORICAL_INTERPRETER.replace("\\", "/"))
+    raw = "".join(f"runtime={variant}\n" for variant in variants).encode("utf-8")
+
+    receipt, outputs, receipt_path = _create_bundle(
+        tmp_path,
+        {"runtime.txt": raw},
+    )
+
+    expected = b"runtime=__HISTORICAL_INTERPRETER__\n" * len(variants)
+    assert outputs["runtime.txt"].read_bytes() == expected
+    assert HISTORICAL_INTERPRETER.encode("ascii") not in receipt_path.read_bytes()
+    assert receipt["schema"] == (
+        "v21e3r1_v9r2r1_public_ci_artifact_sanitization_receipt_v2"
+    )
+    historical_rule = receipt["replacement_contract"]["rules"][0]
+    assert historical_rule == {
+        "id": "historical_interpreter",
+        "replacement": "__HISTORICAL_INTERPRETER__",
+        "match_counts": {"runtime.txt": len(variants)},
+    }
+    assert _verify_bundle(
+        receipt_path=receipt_path,
+        outputs=outputs,
+    ) == receipt
+
+    tampered = copy.deepcopy(receipt)
+    tampered["replacement_contract"]["rules"][0]["match_counts"][
+        "runtime.txt"
+    ] -= 1
+    tampered_path = tmp_path / "historical-count-tampered.receipt.json"
+    _write_rehashed_receipt(tampered_path, tampered)
+    with pytest.raises(
+        SANITIZER.CIArtifactSanitizationError,
+        match="replacement-token count",
+    ):
+        _verify_bundle(
+            receipt_path=tampered_path,
+            outputs=outputs,
+        )
+
+
+def test_historical_interpreter_in_paired_pytest_evidence_preserves_contract(
+    tmp_path: Path,
+) -> None:
+    historical = HISTORICAL_INTERPRETER.encode("ascii")
+    raw_junit = (
+        b'<testsuite tests="1" failures="1" errors="0" skipped="0">'
+        b'<testcase classname="tests.test_runtime" name="test_failure">'
+        b'<failure message="RuntimeError: '
+        + historical
+        + b'">interpreter='
+        + historical
+        + b"</failure></testcase></testsuite>"
+    )
+    raw_log = (
+        b"FAILED tests/test_runtime.py::test_failure - RuntimeError: "
+        + historical
+        + b"\n1 failed in 0.01s\n"
+    )
+    kinds = {
+        "run.junit.xml": "PYTEST_JUNIT_XML",
+        "run.log": "PYTEST_LOG",
+    }
+
+    receipt, outputs, receipt_path = _create_bundle(
+        tmp_path,
+        {"run.junit.xml": raw_junit, "run.log": raw_log},
+        kinds=kinds,
+    )
+
+    for output in outputs.values():
+        sanitized = output.read_bytes()
+        assert historical not in sanitized
+        assert b"__HISTORICAL_INTERPRETER__" in sanitized
+    historical_rule = receipt["replacement_contract"]["rules"][0]
+    assert historical_rule["match_counts"] == {
+        "run.junit.xml": 2,
+        "run.log": 1,
+    }
+    assert _verify_bundle(
+        receipt_path=receipt_path,
+        outputs=outputs,
+        kinds=kinds,
+    ) == receipt
+
+
+@pytest.mark.parametrize(
+    ("prefix", "suffix"),
+    [
+        ("", ".bak"),
+        ("", r"\child"),
+        ("", ":alternate-stream"),
+        ("", "-backup"),
+        ("", "@backup"),
+        ("", "$backup"),
+        ("", "%20backup"),
+        ("", "?query"),
+        ("", "#fragment"),
+        ("", "!backup"),
+        ("", "&backup"),
+        ("", "(backup"),
+        ("", ")backup"),
+        ("", "+backup"),
+        ("", ",backup"),
+        ("", ";backup"),
+        ("", "=backup"),
+        ("", "[backup"),
+        ("", "]backup"),
+        ("", "{backup"),
+        ("", "}backup"),
+        ("", "^backup"),
+        ("", "~backup"),
+        ("", "'backup"),
+        ("", "`backup"),
+        ("", " backup"),
+        ("-", ""),
+        ("@", ""),
+        ("$", ""),
+        ("%20", ""),
+        ("?", ""),
+        ("#", ""),
+        ("!", ""),
+        ("&", ""),
+        ("(", ""),
+        (")", ""),
+        ("+", ""),
+        (",", ""),
+        (";", ""),
+        ("[", ""),
+        ("]", ""),
+        ("{", ""),
+        ("}", ""),
+        ("^", ""),
+        ("~", ""),
+        ("'", ""),
+        ("`", ""),
+        ("file:///", ""),
+    ],
+)
+def test_historical_interpreter_rule_rejects_path_concatenations(
+    tmp_path: Path,
+    prefix: str,
+    suffix: str,
+) -> None:
+    raw = f"path={prefix}{HISTORICAL_INTERPRETER}{suffix}\n".encode("ascii")
+
+    with pytest.raises(ValueError, match="Windows|absolute path|sensitive"):
+        _create_bundle(tmp_path, {"runtime.txt": raw})
+
+
+@pytest.mark.parametrize(
+    "mixed_path",
+    [
+        r"C:\\miniconda3\envs\\ssm_env\python.exe",
+        r"C:/miniconda3\envs/ssm_env\\python.exe",
+        r"C:\\\miniconda3\\\envs\\\ssm_env\\\python.exe",
+    ],
+)
+def test_historical_interpreter_rule_rejects_mixed_or_unsupported_slash_depths(
+    tmp_path: Path,
+    mixed_path: str,
+) -> None:
+    with pytest.raises(ValueError, match="sensitive"):
+        _create_bundle(
+            tmp_path,
+            {"runtime.txt": f"path={mixed_path}\n".encode("ascii")},
+        )
+
+
+def test_actual_historical_interpreter_error_shape_is_sanitized(
+    tmp_path: Path,
+) -> None:
+    observed_prefix = r"C:\hostedtoolcache\windows\Python\3.13.12\x64"
+    raw = (
+        "RuntimeError: Helper must use the exact historical main-job interpreter "
+        f"{HISTORICAL_INTERPRETER}; observed {observed_prefix}\\python.exe\n"
+    ).encode("ascii")
+
+    receipt, outputs, _receipt_path = _create_bundle(
+        tmp_path,
+        {"runtime.txt": raw},
+        environment_prefix=observed_prefix,
+    )
+
+    assert outputs["runtime.txt"].read_bytes() == (
+        b"RuntimeError: Helper must use the exact historical main-job interpreter "
+        b"__HISTORICAL_INTERPRETER__; observed __PYTHON_PREFIX__\\python.exe\n"
+    )
+    rules = {
+        rule["id"]: rule["match_counts"]["runtime.txt"]
+        for rule in receipt["replacement_contract"]["rules"]
+    }
+    assert rules["historical_interpreter"] == 1
+    assert rules["environment_prefix"] == 1
+
+
 def test_xml_character_reference_encoded_windows_path_is_rejected(
     tmp_path: Path,
 ) -> None:
@@ -445,8 +650,38 @@ def test_live_failure_evidence_is_sanitized_even_after_contract_failure() -> Non
     )[1].split("\n      - name:", maxsplit=1)[0]
 
     assert "        if: always()\n" in step
-    assert "scripts/sanitize_public_checkout_outputs.py create" in step
-    assert "scripts/sanitize_public_checkout_outputs.py verify" in step
+    assert "scripts/sanitize_public_ci_artifacts.py create" in step
+    assert "scripts/sanitize_public_ci_artifacts.py verify" in step
+    assert "scripts/sanitize_public_checkout_outputs.py" not in step
+    for expected in (
+        '--input "full_repository.junit.xml=$rawJunit"',
+        '--input "full_repository.log=$rawLog"',
+        '--output "full_repository.junit.xml=$safeJunit"',
+        '--output "full_repository.log=$safeLog"',
+        '--kind "full_repository.junit.xml=PYTEST_JUNIT_XML"',
+        '--kind "full_repository.log=PYTEST_LOG"',
+        "'full_repository.sanitized.junit.xml'",
+        "'full_repository.sanitized.log'",
+        "'V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json'",
+    ):
+        assert expected in step
+    create = step.index("scripts/sanitize_public_ci_artifacts.py create")
+    verify = step.index("scripts/sanitize_public_ci_artifacts.py verify")
+    failure_contract = step.index(
+        "scripts/verify_expected_public_checkout_failure_set.py"
+    )
+    assert create < verify < failure_contract
+
+    checked_in_step = workflow.split(
+        "      - name: Verify checked-in sanitized public-checkout evidence\n",
+        maxsplit=1,
+    )[1].split("\n      - name:", maxsplit=1)[0]
+    assert "scripts/sanitize_public_checkout_outputs.py verify" in checked_in_step
+    assert (
+        "provenance/V9R2R1_RAW_OUTPUT_SANITIZATION_RECEIPT.json"
+        in checked_in_step
+    )
+    assert "scripts/sanitize_public_ci_artifacts.py" not in checked_in_step
 
 
 def test_junit_host_replacement_is_limited_to_testsuite_hostname(
