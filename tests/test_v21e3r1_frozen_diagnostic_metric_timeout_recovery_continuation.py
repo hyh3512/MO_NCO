@@ -285,21 +285,62 @@ def test_external_scheduling_schema_authority_and_cross_hash_drift_fail_closed(
         )
 
 
-def _write_lag_wrapper(tmp_path: Path, *, child_sleep: float) -> tuple[Path, Path, Path]:
+def _write_lag_wrapper(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
     wrapper = tmp_path / "accounting_lag_wrapper.py"
     pid_path = tmp_path / "descendant.pid"
     terminal_path = tmp_path / "descendant.terminal"
+    release_path = tmp_path / "descendant.release"
+    child_code = (
+        "import os\n"
+        "import pathlib\n"
+        "import sys\n"
+        "import time\n"
+        "pid_path = pathlib.Path(sys.argv[1])\n"
+        "terminal_path = pathlib.Path(sys.argv[2])\n"
+        "duration = float(sys.argv[3])\n"
+        "release = sys.argv[4]\n"
+        "pid_temporary = pid_path.with_name(pid_path.name + '.tmp')\n"
+        "pid_temporary.write_text(str(os.getpid()), encoding='utf-8')\n"
+        "os.replace(pid_temporary, pid_path)\n"
+        "if release == '-':\n"
+        "    time.sleep(duration)\n"
+        "else:\n"
+        "    release_path = pathlib.Path(release)\n"
+        "    deadline = time.monotonic() + duration\n"
+        "    while not release_path.is_file():\n"
+        "        if time.monotonic() >= deadline:\n"
+        "            raise SystemExit(92)\n"
+        "        time.sleep(0.01)\n"
+        "terminal_path.write_text('terminal', encoding='utf-8')\n"
+    )
     wrapper.write_text(
-        "import subprocess,sys\n"
-        "if sys.stdin.readline() != sys.argv[4] + '\\n': raise SystemExit(91)\n"
-        "code=\"import os,pathlib,sys,time; "
-        "pathlib.Path(sys.argv[1]).write_text(str(os.getpid())); "
-        "time.sleep(float(sys.argv[3])); "
-        "pathlib.Path(sys.argv[2]).write_text('terminal')\"\n"
-        "subprocess.Popen([sys.executable,'-c',code,sys.argv[1],sys.argv[2],sys.argv[3]])\n",
+        "import pathlib,subprocess,sys,time\n"
+        "if sys.stdin.readline() != sys.argv[5] + '\\n': raise SystemExit(91)\n"
+        f"code = {child_code!r}\n"
+        "child = subprocess.Popen(\n"
+        "    [sys.executable, '-c', code, sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]],\n"
+        "    stdin=subprocess.DEVNULL,\n"
+        "    stdout=subprocess.DEVNULL,\n"
+        "    stderr=subprocess.DEVNULL,\n"
+        "    close_fds=True,\n"
+        ")\n"
+        "pid_path = pathlib.Path(sys.argv[1])\n"
+        "deadline = time.monotonic() + 5.0\n"
+        "while True:\n"
+        "    try:\n"
+        "        int(pid_path.read_text(encoding='utf-8'))\n"
+        "        break\n"
+        "    except (FileNotFoundError, ValueError):\n"
+        "        pass\n"
+        "    if child.poll() is not None:\n"
+        "        raise SystemExit(93)\n"
+        "    if time.monotonic() >= deadline:\n"
+        "        child.kill()\n"
+        "        raise SystemExit(94)\n"
+        "    time.sleep(0.01)\n",
         encoding="utf-8",
     )
-    return wrapper, pid_path, terminal_path
+    return wrapper, pid_path, terminal_path, release_path
 
 
 def test_normal_job_accounting_lag_drains_to_zero_without_false_failure(
@@ -307,9 +348,22 @@ def test_normal_job_accounting_lag_drains_to_zero_without_false_failure(
 ) -> None:
     helper = _load_helper()
     predecessor = helper._load_predecessor(PROJECT_ROOT)
-    wrapper, pid_path, terminal_path = _write_lag_wrapper(
-        tmp_path, child_sleep=1.0
-    )
+    wrapper, pid_path, terminal_path, release_path = _write_lag_wrapper(tmp_path)
+
+    class ReleaseAfterActiveObservationJob:
+        def __init__(self) -> None:
+            self._job = predecessor._WindowsKillOnCloseJob()
+
+        def active_processes(self) -> int:
+            active = self._job.active_processes()
+            if active > 0 and not release_path.exists():
+                temporary = release_path.with_name(release_path.name + ".tmp")
+                temporary.write_text("release", encoding="utf-8")
+                os.replace(temporary, release_path)
+            return active
+
+        def __getattr__(self, name: str) -> object:
+            return getattr(self._job, name)
 
     def terminal_zero() -> dict[str, object]:
         pid = int(pid_path.read_text(encoding="utf-8"))
@@ -323,7 +377,8 @@ def test_normal_job_accounting_lag_drains_to_zero_without_false_failure(
             str(wrapper),
             str(pid_path),
             str(terminal_path),
-            "1.0",
+            "5.0",
+            str(release_path),
             helper.JOB_START_GATE_ARGUMENT,
         ],
         cwd=tmp_path,
@@ -332,10 +387,11 @@ def test_normal_job_accounting_lag_drains_to_zero_without_false_failure(
         accounting_grace_seconds=3,
         start_gate_line=helper.JOB_START_GATE_LINE,
         terminal_zero_check=terminal_zero,
-        job_factory=predecessor._WindowsKillOnCloseJob,
+        job_factory=ReleaseAfterActiveObservationJob,
     )
 
     assert completed.returncode == 0
+    assert release_path.read_text(encoding="utf-8") == "release"
     assert terminal_path.read_text(encoding="utf-8") == "terminal"
     assert witness["initial_active_processes_after_wrapper_exit"] > 0
     assert witness["accounting_lag_observed"] is True
@@ -349,9 +405,7 @@ def test_true_persistent_descendant_is_killed_and_fails_after_grace(
 ) -> None:
     helper = _load_helper()
     predecessor = helper._load_predecessor(PROJECT_ROOT)
-    wrapper, pid_path, terminal_path = _write_lag_wrapper(
-        tmp_path, child_sleep=60.0
-    )
+    wrapper, pid_path, terminal_path, _release_path = _write_lag_wrapper(tmp_path)
 
     def terminal_zero() -> dict[str, object]:
         pid = int(pid_path.read_text(encoding="utf-8"))
@@ -367,6 +421,7 @@ def test_true_persistent_descendant_is_killed_and_fails_after_grace(
                 str(pid_path),
                 str(terminal_path),
                 "60.0",
+                "-",
                 helper.JOB_START_GATE_ARGUMENT,
             ],
             cwd=tmp_path,

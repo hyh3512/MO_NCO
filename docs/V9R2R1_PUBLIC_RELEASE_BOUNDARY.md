@@ -80,6 +80,14 @@ transitive package archives, operating-system image, and native ABI closure
 are still not completely artifact-hashed, so
 `environment_lock_requirement_satisfied` remains `false`.
 
+The Windows Job accounting-lag test harness uses an explicit descendant-ready
+and release handshake, with the descendant standard streams detached, so the
+intended active-to-zero branch is selected independently of scheduler and pipe
+timing. This is a test-only determinism repair: it does not modify the
+hash-bound frozen helper or the exact 78-outcome public-checkout registry, and
+it demonstrates active-descendant grace drain rather than pure kernel
+accounting staleness.
+
 ## Independent-reproduction boundary
 
 The standard-library-only utilities can independently recompute selected
